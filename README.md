@@ -133,10 +133,48 @@ job. Both matrices render as diverging heatmaps —
 `results/brand_archetype_correlation.png` and
 `results/brand_archetype_excess_correlation.png`.
 
+Note this correlation check answers a *different* question than the excess-return
+table above: correlation tests whether baskets *move together day to day*, not
+whether their *total* returns differ. Two baskets can have zero correlation and
+still have wildly different 10-year totals — which is exactly why the next
+section exists.
+
+**Significance test: is any of this real, or just small-N luck?** With 4-5
+brands per archetype, a gap as big as magician's +119% or sage's −35% could
+easily be luck of the draw rather than an archetype effect. This reuses the
+Trends side's own statistical machinery (`src/nulls.py`'s empirical null +
+Benjamini-Hochberg FDR): each archetype's sector-neutralized basket return is
+tested against **2000 random same-size baskets** drawn from the same 51-brand
+universe (ignoring the real archetype labels), giving a two-sided empirical
+p-value, then FDR-corrected across all 12 archetypes at the same 10% threshold
+the Trends side uses. In a recent 10y pull:
+
+```
+Archetype significance (null = 2000 random same-size baskets from the same brand universe; BH FDR alpha=10%):
+  magician   n=4  obs= +118.9%  null~ +36.5%(sd  99.5)  p=0.266  q=0.716
+  sage       n=4  obs=  -35.4%  null~ +36.4%(sd 108.2)  p=0.269  q=0.716
+  ...
+  everyman   n=5  obs=  +17.2%  null~ +34.2%(sd  83.9)  p=0.900  q=0.900
+
+0/12 archetypes survive FDR correction.
+```
+
+**0 of 12 survive.** The null's own standard deviation (≈90-115 percentage
+points) dwarfs every observed gap — with only 4-5 stocks, one outlier (Nvidia,
+Tesla, Coinbase...) swings a basket's total return by more than a hundred
+points on its own, so no archetype's result is distinguishable from picking 4-5
+random names out of this same hat. One honest wrinkle: the null draws from the
+*same* hand-picked universe of famous, often-winning brands rather than the
+broader market, so its own average excess return runs high (+35 to +44%, not
+0%) — this test only asks "does archetype membership matter *within this
+curated set*", a narrower and more conservative question than "do these brands
+beat the market."
+
 Same discipline as the rest of the repo: the baskets are small, hand-picked,
 and even sector-neutralized doesn't remove every confound (single names like
 Nvidia can still dominate a small basket) — any gap is a **hypothesis, not a
-finding**.
+finding**, and this run's own significance test says the hypothesis hasn't
+cleared the bar yet.
 
 ## Method
 
@@ -194,9 +232,11 @@ analyze.py                      CLI: import exports -> results/*.png
 Brand-archetypes-in-markets path (live, no key needed):
 
 ```
-brands.yaml                     the twelve brand archetypes -> tickers (edit here)
+brands.yaml                     the twelve brand archetypes -> tickers + sector ETF (edit here)
 src/brands.py                   brand loader + archetype grouping
 src/stocks.py                   live Yahoo Finance provider (adjusted close, cached)
+src/visualize.py                (also) archetype indices, growth rates, correlation heatmaps
+src/archetype_significance.py   empirical null + BH FDR for archetype basket returns
 withdraw_stocks.py              CLI: pull live prices -> data/stocks/ + results/*.png
 ```
 

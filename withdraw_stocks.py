@@ -32,6 +32,13 @@ sector-neutralized) and each basket's correlation with the market, and renders
 brand_archetype_correlation.png / brand_archetype_excess_correlation.png --
 diverging heatmaps of the full pairwise matrix.
 
+Finally, is any of this real, or is a ~4-5-stock basket just small-N luck?
+Reusing this repo's Trends-side null-model machinery (src/nulls.py's empirical
+null + Benjamini-Hochberg FDR), each archetype's sector-neutralized return is
+tested against an empirical null of random same-size baskets drawn from the
+same brand universe, and the resulting p-values get FDR-corrected across all 12
+archetypes -- exactly like the Trends side's per-term significance test.
+
 This is the markets counterpart to analyze.py. Like the rest of the repo it is a
 pattern-*looker*, not a claim: archetype baskets are tiny, hand-picked, and
 confounded by sector and shared market beta -- treat any gap as a hypothesis,
@@ -44,7 +51,9 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.archetype_significance import archetype_significance
 from src.brands import by_archetype, load_brands, unique_sectors
+from src.config import FDR_ALPHA
 from src.stocks import get_stock_provider
 from src.visualize import (
     archetype_excess_index,
@@ -87,6 +96,8 @@ def main() -> None:
     ap.add_argument("--interval", default="1d", help="bar interval (1d, 1wk, 1mo)")
     ap.add_argument("--window", type=int, default=63,
                      help="rolling window in trading days for the growth-rate charts (default 63 ~= 1 quarter)")
+    ap.add_argument("--n-bootstrap", type=int, default=2000,
+                     help="random same-size baskets drawn per archetype for the significance test")
     args = ap.parse_args()
 
     brands = load_brands()
@@ -198,6 +209,23 @@ def main() -> None:
             outfile="brand_archetype_excess_correlation.png",
         )
         print(f"Wrote {excess_corr_path}")
+
+    # Is each archetype's sector-neutralized return distinguishable from an
+    # arbitrary same-size grab of the same brand universe, or is it just
+    # small-N luck? Empirical null + BH FDR, same method as the Trends side.
+    if have and have_sectors:
+        sig = archetype_significance(brands, series, sector_series, n_bootstrap=args.n_bootstrap)
+        if not sig.empty:
+            print(f"\nArchetype significance (null = {args.n_bootstrap} random same-size baskets "
+                  f"from the same brand universe; BH FDR alpha={FDR_ALPHA:.0%}):")
+            for archetype, row in sig.iterrows():
+                flag = "  <-- significant" if row["significant"] else ""
+                print(f"  {archetype:10s} n={int(row['n_brands'])}  "
+                      f"obs={row['observed_excess_return']:+7.1f}%  "
+                      f"null~{row['null_mean']:+6.1f}%(sd {row['null_std']:5.1f})  "
+                      f"p={row['p_value']:.3f}  q={row['q_value']:.3f}{flag}")
+            n_sig = int(sig["significant"].sum())
+            print(f"\n{n_sig}/{len(sig)} archetypes survive FDR correction.")
 
     print(f"\nPer-ticker CSVs in {STOCKS_DIR}/")
 
