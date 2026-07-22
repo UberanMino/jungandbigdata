@@ -1,0 +1,144 @@
+scope,list,rank,trend,archetype_primary,archetype_secondary,charge,rationale
+global,global_trending,1,Gemini,sage,trickster,med,Google's AI as modern oracle; the name is the Twins (duality/doubling).
+global,global_trending,2,India vs England,hero,,med,Ritual combat (cricket).
+global,global_trending,3,Charlie Kirk,death,shadow,high,Slain activist; martyrdom/sacrificial death.
+global,global_trending,4,Club World Cup,hero,,med,Ritual combat (football tournament).
+global,global_trending,5,India vs Australia,hero,,med,Ritual combat (cricket).
+global,global_trending,6,DeepSeek,trickster,sage,high,Upstart AI that upended incumbents overnight -- the disruptor/boundary-breaker; also AI-as-oracle.
+global,global_trending,7,Asia Cup,hero,,med,Ritual combat (cricket).
+global,global_trending,8,Iran,apocalypse,shadow,high,2025 strikes/war; fire-and-war end-times imagery + the national 'enemy'.
+global,global_trending,9,iPhone 17,persona,,low,Consumer fetish object; little mythic depth.
+global,global_trending,10,Pakistan and India,apocalypse,hero,med,Cross-border conflict -- war + martial contest.
+us,us_trending,1,Charlie Kirk,death,shadow,high,Slain activist; martyrdom/sacrificial death.
+us,us_trending,2,KPop Demon Hunters,hero,shadow,high,Literal hero-vs-demon myth -- the monster-slaying quest.
+us,us_trending,3,Labubu,trickster,serpent_beast,med,Beloved little-monster toy craze -- the domesticated imp / cute-shadow.
+us,us_trending,4,iPhone 17,persona,,low,Consumer fetish object; little mythic depth.
+us,us_trending,5,One Big Beautiful Bill Act,ruler,,med,Sweeping state law -- the sovereign's decree.
+us,us_trending,6,Zohran Mamdani,hero,ruler,high,Young insurgent becomes sovereign -- new champion + renewal of the city.
+us,us_trending,7,DeepSeek,trickster,sage,high,Upstart AI that upended incumbents overnight -- the disruptor/boundary-breaker; also AI-as-oracle.
+us,us_trending,8,Government shutdown,ruler,apocalypse,med,Paralysis/collapse of state authority.
+us,us_trending,9,FIFA Club World Cup,hero,,med,Ritual combat (football tournament).
+us,us_trending,10,Tariffs,ruler,,low,"Sovereign economic power; abstract, low mythic charge."
+global,global_news,1,Charlie Kirk assassination,shadow,death,high,Political killing -- the violent dark eruption + sacrificial death.
+global,global_news,2,Iran,apocalypse,shadow,high,2025 strikes/war; fire-and-war end-times imagery + the national 'enemy'.
+global,global_news,3,US Government Shutdown,ruler,apocalypse,med,Paralysis of state authority.
+global,global_news,4,New Pope chosen,sage,rebirth,high,Election of the spiritual father -- the Wise Old Man renewed.
+global,global_news,5,LA Fires,apocalypse,,high,Conflagration -- the destroying/purifying fire.
+global,global_news,6,Hurricane Melissa,apocalypse,great_mother,high,Devouring storm -- nature-as-destroyer.
+global,global_news,7,TikTok ban,ruler,trickster,med,The state moving against the platform of memetic chaos -- ruler vs trickster.
+global,global_news,8,Zohran Mamdani elected,ruler,hero,high,Accession of a new ruler.
+global,global_news,9,USAID,ruler,great_mother,low,State aid apparatus dismantled -- the withdrawn nurturing hand.
+global,global_news,10,Kamchatka Earthquake and Tsunami,apocalypse,,high,Quake + deluge -- the flood that unmakes.
+us,us_news,1,One Big Beautiful Bill Act,ruler,,med,Sweeping state law -- the sovereign's decree.
+us,us_news,2,Government shutdown,ruler,apocalypse,med,Paralysis/collapse of state authority.
+us,us_news,3,Charlie Kirk assassination,shadow,death,high,Political killing -- the violent dark eruption + sacrificial death.
+us,us_news,4,Tariffs,ruler,,low,"Sovereign economic power; abstract, low mythic charge."
+us,us_news,5,No Kings protest,ruler,hero,high,Explicit revolt against the father-king.
+us,us_news,6,Los Angeles fires,apocalypse,,high,Conflagration.
+us,us_news,7,New Pope chosen,sage,rebirth,high,Election of the spiritual father -- the Wise Old Man renewed.
+us,us_news,8,Epstein files,shadow,,high,Hidden corruption dragged to light -- the collective shadow.
+us,us_news,9,US Presidential Inauguration,ruler,,high,Coronation of the sovereign.
+us,us_news,10,Hurricane Melissa,apocalypse,great_mother,high,Devouring storm -- nature-as-destroyer.
+us,us_ai_trends,1,AI action figure,self,persona,med,Turning oneself into a doll/idol -- self-image made object.
+us,us_ai_trends,2,AI Barbie,self,persona,med,Self-as-doll; idealized image.
+us,us_ai_trends,3,Holy airball,trickster,,low,Sports-meme absurdity.
+us,us_ai_trends,4,AI Ghostface,shadow,trickster,med,Horror-mask self-image -- playing with the shadow.
+us,us_ai_trends,5,AI Polaroid,self,persona,low,Nostalgic self-image.
+us,us_ai_trends,6,Chicken jockey,trickster,,low,Minecraft-movie meme; absurd inversion.
+us,us_ai_trends,7,Bacon avocado,trickster,,low,Food meme; nonsense.
+us,us_ai_trends,8,Anxiety dance,trickster,shadow,low,Mocking dread through absurd performance.
+us,us_ai_trends,9,Unfortunately I do love,trickster,,low,Ironic catchphrase meme.
+us,us_ai_trends,10,Ghibli,divine_child,self,med,AI-Ghibli images -- the childlike numinous world; wonder.
+global,global_people,1,d4vd,shadow,anima,high,Young heartthrob engulfed by a dark death-scandal -- persona swallowed by shadow.
+global,global_people,2,Kendrick Lamar,hero,,med,The bard-champion (Super Bowl) -- cultural warrior.
+global,global_people,3,Jimmy Kimmel,trickster,ruler,med,The jester suspended/reinstated over Kirk remarks -- jester vs authority.
+global,global_people,4,Tyler Robinson,shadow,,high,The assassin -- the destroyer figure.
+global,global_people,5,Pope Leo XIV,sage,ruler,high,The spiritual father/sovereign.
+global,global_people,6,Vaibhav Sooryavanshi,divine_child,hero,med,Teen cricket prodigy -- the wonder-child.
+global,global_people,7,Shedeur Sanders,hero,shadow,med,The anointed young QB whose draft 'fall' became the story.
+global,global_people,8,Bianca Censori,anima,persona,med,The eroticized spectacle/muse.
+global,global_people,9,Zohran Mamdani,hero,ruler,high,Young insurgent becomes sovereign -- new champion + renewal of the city.
+global,global_people,10,Greta Thunberg,hero,great_mother,med,The crusader / earth-defender.
+us,us_people,1,Zohran Mamdani,hero,ruler,high,Young insurgent becomes sovereign -- new champion + renewal of the city.
+us,us_people,2,Tyler Robinson,shadow,,high,The assassin -- the destroyer figure.
+us,us_people,3,d4vd,shadow,anima,high,Young heartthrob engulfed by a dark death-scandal -- persona swallowed by shadow.
+us,us_people,4,Erika Kirk,great_mother,death,med,The public widow; the mourning feminine.
+us,us_people,5,Pope Leo XIV,sage,ruler,high,The spiritual father/sovereign.
+us,us_people,6,Shedeur Sanders,hero,shadow,med,The anointed young QB whose draft 'fall' became the story.
+us,us_people,7,Bonnie Blue,anima,shadow,med,Shadow-eros; the transgressive/devouring feminine spectacle.
+us,us_people,8,Karoline Leavitt,ruler,persona,low,The sovereign's herald (press secretary).
+us,us_people,9,Andy Byron,shadow,trickster,med,The 'kiss-cam' CEO -- the exposed secret + public humiliation.
+us,us_people,10,Jimmy Kimmel,trickster,ruler,med,The jester suspended/reinstated over Kirk remarks -- jester vs authority.
+mixed,passings,1,Charlie Kirk,death,shadow,high,Slain activist; martyrdom/sacrificial death.
+global,global_actors,1,Mikey Madison,persona,anima,low,Star image (Anora).
+global,global_actors,2,Lewis Pullman,persona,,low,Star image.
+global,global_actors,3,Isabela Merced,persona,,low,Star image.
+global,global_actors,4,Song Ji Woo,persona,,low,Star image.
+global,global_actors,5,Kaitlyn Dever,persona,,low,Star image.
+us,us_actors,1,Pedro Pascal,persona,ruler,low,Star image (often the protector-father).
+us,us_actors,2,Malachi Barton,persona,maiden,low,Young star image.
+us,us_actors,3,Walton Goggins,persona,shadow,low,Star image (often plays heels).
+us,us_actors,4,Pamela Anderson,anima,persona,low,The eroticized icon in a late-career 'unmasked' turn.
+us,us_actors,5,Charlie Sheen,shadow,persona,low,The fallen-star image; public shadow.
+global,global_movies,1,Anora,maiden,anima,med,Sex-worker Cinderella -- the maiden's precarious threshold.
+global,global_movies,2,Superman,hero,,high,The archetypal savior-hero.
+global,global_movies,3,Minecraft Movie,divine_child,self,med,World-building play -- creation/wholeness.
+global,global_movies,4,Thunderbolts,shadow,hero,med,A team of redeemed villains -- integrating the shadow.
+global,global_movies,5,Sinners,serpent_beast,shadow,high,Vampire horror -- the beast/blood + the dark.
+us,us_movies,1,KPop Demon Hunters,hero,shadow,high,Literal hero-vs-demon myth -- the monster-slaying quest.
+us,us_movies,2,Sinners,serpent_beast,shadow,high,Vampire horror -- the beast/blood + the dark.
+us,us_movies,3,The Minecraft Movie,divine_child,self,med,World-building play -- creation/wholeness.
+us,us_movies,4,Happy Gilmore 2,trickster,,low,Comedy -- the fool.
+us,us_movies,5,Thunderbolts,shadow,hero,med,A team of redeemed villains -- integrating the shadow.
+global,global_tv,1,Monster: The Ed Gein Story,shadow,death,high,The literal monster/killer -- the devouring dark.
+global,global_tv,2,The Hunting Wives,anima,shadow,med,Eros + murder -- the femme-fatale shadow.
+global,global_books,1,Regretting You,anima,maiden,low,Romance/family melodrama.
+global,global_books,2,Onyx Storm,serpent_beast,anima,med,Dragon 'romantasy' -- the dragon + eros.
+global,global_books,3,Lights Out,anima,shadow,med,Dark romance -- eros in the shadow.
+global,global_books,4,The Summer I Turned Pretty,maiden,anima,med,Coming-of-age first love.
+global,global_books,5,The Housemaid,shadow,,med,Domestic thriller -- the hidden menace.
+global,global_books,6,Frankenstein,rebirth,shadow,high,Reanimation + the created monster -- death/rebirth and the shadow-double.
+global,global_books,7,It,shadow,trickster,high,The fear-eating clown -- trickster-shadow devouring children.
+global,global_books,8,Animal Farm,ruler,shadow,high,Corruption of power -- the ruler turned devourer.
+global,global_books,9,The Witcher,hero,serpent_beast,med,The monster-slayer's quest.
+global,global_books,10,Diary of a Wimpy Kid,maiden,trickster,low,Childhood/school foibles -- the young fool.
+us,us_books,1,Regretting You,anima,maiden,low,Romance/family melodrama.
+us,us_books,2,Onyx Storm,serpent_beast,anima,med,Dragon 'romantasy' -- the dragon + eros.
+us,us_books,3,Lights Out,anima,shadow,med,Dark romance -- eros in the shadow.
+us,us_books,4,The Summer I Turned Pretty,maiden,anima,med,Coming-of-age first love.
+us,us_books,5,The Housemaid,shadow,,med,Domestic thriller -- the hidden menace.
+us,us_books,6,It,shadow,trickster,high,The fear-eating clown -- trickster-shadow devouring children.
+us,us_books,7,Animal Farm,ruler,shadow,high,Corruption of power -- the ruler turned devourer.
+us,us_books,8,The Great Gatsby,anima,hero,med,Longing for the idealized beloved -- the doomed romantic quest.
+us,us_books,9,To Kill a Mockingbird,hero,sage,med,Moral courage; the just father (Atticus) as sage.
+us,us_books,10,1984,ruler,shadow,high,The total surveillance state -- the devouring father-king.
+global,global_games,1,Arc Raiders,hero,,med,Cooperative combat/survival -- the warrior.
+global,global_games,2,Battlefield 6,hero,apocalypse,med,War combat.
+global,global_games,3,Strands,self,,low,Word-weaving puzzle -- pattern/wholeness (weak).
+global,global_games,4,Split Fiction,self,hero,med,Two-worlds duality co-op -- doubling/integration.
+global,global_games,5,Clair Obscur: Expedition 33,death,hero,high,A doomed annual expedition against mortality -- the death/rebirth quest.
+us,us_games,1,Clair Obscur: Expedition 33,death,hero,high,A doomed annual expedition against mortality -- the death/rebirth quest.
+us,us_games,2,Battlefield 6,hero,apocalypse,med,War combat.
+us,us_games,3,Hollow Knight: Silksong,hero,shadow,med,The small knight's descent into the abyss.
+us,us_games,4,ARC Raiders,hero,,med,Cooperative combat/survival -- the warrior.
+us,us_games,5,The Elder Scrolls IV: Oblivion Remastered,rebirth,apocalypse,med,A literal remaster (rebirth) of a game about the gates of 'Oblivion'.
+us,us_musicians,1,d4vd,shadow,anima,high,Young heartthrob engulfed by a dark death-scandal -- persona swallowed by shadow.
+us,us_musicians,2,KATSEYE,persona,anima,low,Pop-group image.
+us,us_musicians,3,Bad Bunny,trickster,hero,med,Genre-bending shapeshifter; cultural champion.
+us,us_musicians,4,Sombr,persona,anima,low,Young-artist image.
+us,us_musicians,5,Doechii,trickster,anima,med,Boundary-breaking performer.
+us,us_songs,1,Wood,trickster,anima,low,Innuendo pop (Taylor Swift) -- ribald play.
+us,us_songs,2,DtMF,rebirth,,low,Bad Bunny's 'debi tirar mas fotos' -- longing for the past.
+us,us_songs,3,Golden (HUNTR/X),hero,,med,Anthem from the demon-hunter film -- the golden hero.
+us,us_songs,4,The Fate of Ophelia,death,anima,high,Ophelia = the drowning maiden -- death + anima.
+us,us_songs,5,Father Figure,ruler,,med,Explicit father archetype (Taylor Swift).
+global,global_sports_events,1,FIFA Club World Cup,hero,,med,Ritual combat (football tournament).
+global,global_sports_events,2,Asia Cup,hero,,med,Ritual combat (cricket).
+global,global_sports_events,3,ICC Champions Trophy,hero,,med,Ritual combat (cricket).
+global,global_sports_events,4,ICC Women's World Cup,hero,,med,Ritual combat (cricket).
+global,global_sports_events,5,Ryder Cup,hero,,med,Ritual combat (golf).
+global,global_sports_events,6,EuroBasket,hero,,med,Ritual combat (basketball).
+global,global_sports_events,7,Concacaf Gold Cup,hero,,med,Ritual combat (football).
+global,global_sports_events,8,4 Nations Face-Off,hero,,med,Ritual combat (hockey).
+global,global_sports_events,9,UFC 313,hero,serpent_beast,med,Single combat -- the warrior/beast.
+global,global_sports_events,10,UFC 311,hero,serpent_beast,med,Single combat -- the warrior/beast.

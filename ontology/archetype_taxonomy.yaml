@@ -1,0 +1,29 @@
+# Working archetype taxonomy for BOTTOM-UP classification of real trends.
+#
+# The original ontology/archetypes.yaml maps archetypes -> symbolic *search
+# queries* (top-down). This file instead names the archetypes we tag real
+# trending searches WITH (bottom-up). It extends the classic set beyond the
+# symbol-clusters so we can place people and events (a slain activist, an elected
+# pope, a viral toy) -- not just mythic nouns.
+#
+# Tags are a reading, not a measurement. "charge" records how strongly a trend
+# carries archetypal (vs. purely commercial/logistical) content, so we can
+# down-weight brand noise the same way we flagged it in the top-down pass.
+
+version: 1
+archetypes:
+  hero:         {label: "Hero / Warrior",   gloss: "The champion who strives, contests, or slays; ritual combat, the quest."}
+  shadow:       {label: "Shadow",           gloss: "The dark, disowned, destructive; villains, assassins, the exposed secret, the monster."}
+  trickster:    {label: "Trickster",        gloss: "Chaos, absurdity, inversion, the meme, the disruptor, the shapeshifter/jester."}
+  ruler:        {label: "Ruler / Father-King", gloss: "Sovereignty, law, the state, authority and rebellion against it."}
+  sage:         {label: "Sage / Wise Old Man", gloss: "Wisdom, guidance, the oracle; the spiritual father; the AI-as-oracle."}
+  great_mother: {label: "Great Mother",     gloss: "Nurturing/devouring source; earth and storm; the mourning or engulfing feminine."}
+  anima:        {label: "Anima / Eros",     gloss: "The eroticized/idealized feminine; muse, seductress, spectacle, romance."}
+  maiden:       {label: "Maiden / Coming-of-age", gloss: "Youthful innocence, first love, the ingénue, the threshold of adulthood."}
+  divine_child: {label: "Divine Child",     gloss: "The prodigy, the wonder, innocence and the numinous new; world-making play."}
+  self:         {label: "Self / Wholeness", gloss: "Integration, the mandala, self-image and its doubling; the world made whole."}
+  rebirth:      {label: "Rebirth",          gloss: "Death-and-renewal, resurrection, the remaster/revival, transformation."}
+  death:        {label: "Death",            gloss: "Mortality made vivid; passings, martyrdom, the underworld crossing."}
+  apocalypse:   {label: "Apocalypse",       gloss: "Catastrophe and end-times; war, fire, flood, quake -- the world unmade."}
+  serpent_beast: {label: "Serpent / Beast", gloss: "Primal animal/monstrous energy; the dragon, the wolf, the venomous."}
+  persona:      {label: "Persona",          gloss: "The social mask; celebrity image and consumer fetish with little mythic depth (low charge)."}

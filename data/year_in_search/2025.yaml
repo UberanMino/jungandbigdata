@@ -1,0 +1,91 @@
+# Google "Year in Search 2025" trending lists (verbatim), retrieved 2026-07-22.
+#
+# These are TRENDING queries -- the searches that grew fastest in 2025 vs 2024,
+# not the highest-volume searches. This is the bottom-up corpus for the
+# archetypal-classification experiment: instead of guessing symbol->archetype
+# queries, we take what people actually surged toward and read the archetypes
+# out of it afterward.
+#
+# Source: Google Year in Search 2025, as reported by Search Engine Land and
+# Search Engine Journal (see results/YEAR_IN_SEARCH_FINDINGS.md for URLs).
+# "Year in Search 2026" does not exist yet (we are mid-2026), so 2025 is the most
+# recent complete annual list and the best available proxy for "the last year".
+
+year: 2025
+lists:
+  global_trending:
+    scope: global
+    items: [Gemini, India vs England, Charlie Kirk, Club World Cup, India vs Australia,
+            DeepSeek, Asia Cup, Iran, iPhone 17, Pakistan and India]
+  us_trending:
+    scope: us
+    items: [Charlie Kirk, KPop Demon Hunters, Labubu, iPhone 17, One Big Beautiful Bill Act,
+            Zohran Mamdani, DeepSeek, Government shutdown, FIFA Club World Cup, Tariffs]
+  global_news:
+    scope: global
+    items: [Charlie Kirk assassination, Iran, US Government Shutdown, New Pope chosen,
+            LA Fires, Hurricane Melissa, TikTok ban, Zohran Mamdani elected, USAID,
+            Kamchatka Earthquake and Tsunami]
+  us_news:
+    scope: us
+    items: [One Big Beautiful Bill Act, Government shutdown, Charlie Kirk assassination,
+            Tariffs, No Kings protest, Los Angeles fires, New Pope chosen, Epstein files,
+            US Presidential Inauguration, Hurricane Melissa]
+  us_ai_trends:
+    scope: us
+    items: [AI action figure, AI Barbie, Holy airball, AI Ghostface, AI Polaroid,
+            Chicken jockey, Bacon avocado, Anxiety dance, "Unfortunately I do love", Ghibli]
+  global_people:
+    scope: global
+    items: [d4vd, Kendrick Lamar, Jimmy Kimmel, Tyler Robinson, Pope Leo XIV,
+            Vaibhav Sooryavanshi, Shedeur Sanders, Bianca Censori, Zohran Mamdani, Greta Thunberg]
+  us_people:
+    scope: us
+    items: [Zohran Mamdani, Tyler Robinson, d4vd, Erika Kirk, Pope Leo XIV,
+            Shedeur Sanders, Bonnie Blue, Karoline Leavitt, Andy Byron, Jimmy Kimmel]
+  passings:
+    scope: mixed
+    items: [Charlie Kirk]
+  global_actors:
+    scope: global
+    items: [Mikey Madison, Lewis Pullman, Isabela Merced, Song Ji Woo, Kaitlyn Dever]
+  us_actors:
+    scope: us
+    items: [Pedro Pascal, Malachi Barton, Walton Goggins, Pamela Anderson, Charlie Sheen]
+  global_movies:
+    scope: global
+    items: [Anora, Superman, Minecraft Movie, "Thunderbolts", Sinners]
+  us_movies:
+    scope: us
+    items: [KPop Demon Hunters, Sinners, The Minecraft Movie, Happy Gilmore 2, "Thunderbolts"]
+  global_tv:
+    scope: global
+    items: ["Monster: The Ed Gein Story", The Hunting Wives]
+  global_books:
+    scope: global
+    items: [Regretting You, Onyx Storm, Lights Out, The Summer I Turned Pretty, The Housemaid,
+            Frankenstein, It, Animal Farm, The Witcher, Diary of a Wimpy Kid]
+  us_books:
+    scope: us
+    items: [Regretting You, Onyx Storm, Lights Out, The Summer I Turned Pretty, The Housemaid,
+            It, Animal Farm, The Great Gatsby, To Kill a Mockingbird, "1984"]
+  global_games:
+    scope: global
+    items: [Arc Raiders, Battlefield 6, Strands, Split Fiction, "Clair Obscur: Expedition 33"]
+  us_games:
+    scope: us
+    items: ["Clair Obscur: Expedition 33", Battlefield 6, "Hollow Knight: Silksong",
+            ARC Raiders, "The Elder Scrolls IV: Oblivion Remastered"]
+  us_musicians:
+    scope: us
+    items: [d4vd, KATSEYE, Bad Bunny, Sombr, Doechii]
+  us_songs:
+    scope: us
+    items: ["Wood", "DtMF", "Golden (HUNTR/X)", "The Fate of Ophelia", "Father Figure"]
+  global_sports_events:
+    scope: global
+    items: [FIFA Club World Cup, Asia Cup, ICC Champions Trophy, "ICC Women's World Cup",
+            Ryder Cup, EuroBasket, Concacaf Gold Cup, 4 Nations Face-Off, UFC 313, UFC 311]
+
+# Deliberately excluded as low archetypal charge (logistics/consumer, not mythic):
+# Google Maps bookstores & transit stations, US travel itineraries, viral dishes.
