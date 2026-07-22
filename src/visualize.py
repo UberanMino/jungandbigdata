@@ -60,16 +60,16 @@ def plot_small_multiples(series_by_key: dict[str, pd.DataFrame], outfile: str = 
     return path
 
 
-def archetype_index(series_by_ticker: dict[str, pd.Series], members: list[Brand]) -> pd.Series:
-    """Daily-rebalanced equal-weight index of an archetype's brands, based at 100.
+def archetype_daily_return(series_by_ticker: dict[str, pd.Series], members: list[Brand]) -> pd.Series:
+    """Daily-rebalanced equal-weight return of an archetype's basket (not compounded).
 
     Rather than requiring every member to exist on day one (which would truncate
     the basket to its youngest brand), we average the *daily returns* of whichever
-    members are trading each day and compound them into an index. So a brand that
-    IPOs partway through simply joins its basket from that day on -- the natural
-    way to handle staggered listings (Airbnb 2020, Coinbase 2021, Reddit 2024...).
-    Composition therefore grows over the window; the index reads as "growth of an
-    equal-weight, daily-rebalanced basket of this archetype's brands".
+    members are trading each day. So a brand that IPOs partway through simply
+    joins its basket from that day on -- the natural way to handle staggered
+    listings (Airbnb 2020, Coinbase 2021, Reddit 2024...). NaNs are left as NaN
+    (not filled) so this series is safe to feed directly into a correlation
+    matrix; archetype_index fills them with 0 before compounding.
     """
     cols = {t: s for t, s in ((b.ticker, series_by_ticker.get(b.ticker)) for b in members)
             if s is not None and not s.empty}
@@ -79,22 +79,28 @@ def archetype_index(series_by_ticker: dict[str, pd.Series], members: list[Brand]
     frame = frame.ffill()  # carry prices over market-holiday gaps; pre-IPO stays NaN
     first = frame.dropna(how="all").index.min()
     frame = frame.loc[first:]
-    basket_ret = frame.pct_change().mean(axis=1, skipna=True).fillna(0.0)
-    return (1.0 + basket_ret).cumprod() * 100.0
+    return frame.pct_change().mean(axis=1, skipna=True)
 
 
-def archetype_excess_index(
+def archetype_index(series_by_ticker: dict[str, pd.Series], members: list[Brand]) -> pd.Series:
+    """Cumulative index (based at 100) of archetype_daily_return, compounded."""
+    basket_ret = archetype_daily_return(series_by_ticker, members)
+    if basket_ret.empty:
+        return pd.Series(dtype=float)
+    return (1.0 + basket_ret.fillna(0.0)).cumprod() * 100.0
+
+
+def archetype_excess_daily_return(
     series_by_ticker: dict[str, pd.Series],
     sector_series_by_ticker: dict[str, pd.Series],
     members: list[Brand],
 ) -> pd.Series:
-    """Sector-neutralized version of archetype_index.
+    """Sector-neutralized version of archetype_daily_return (not compounded).
 
     Each brand's daily return is replaced by its *excess* return over its own
-    SPDR sector ETF (brand.sector in brands.yaml) before the same
-    daily-rebalanced equal-weight compounding is applied. This isolates "did
-    this archetype's brands beat their own industry" from "growth/tech had a
-    good decade" -- the confound the plain archetype_index can't separate
+    SPDR sector ETF (brand.sector in brands.yaml) before basket-averaging. This
+    isolates "did this archetype's brands beat their own industry" from
+    "growth/tech had a good decade" -- the confound plain returns can't separate
     (e.g. the magician basket is largely a tech bet).
     """
     excess_cols: dict[str, pd.Series] = {}
@@ -110,8 +116,19 @@ def archetype_excess_index(
     frame = pd.DataFrame(excess_cols).sort_index()
     first = frame.dropna(how="all").index.min()
     frame = frame.loc[first:]
-    basket_ret = frame.mean(axis=1, skipna=True).fillna(0.0)
-    return (1.0 + basket_ret).cumprod() * 100.0
+    return frame.mean(axis=1, skipna=True)
+
+
+def archetype_excess_index(
+    series_by_ticker: dict[str, pd.Series],
+    sector_series_by_ticker: dict[str, pd.Series],
+    members: list[Brand],
+) -> pd.Series:
+    """Cumulative index (based at 100) of archetype_excess_daily_return, compounded."""
+    basket_ret = archetype_excess_daily_return(series_by_ticker, sector_series_by_ticker, members)
+    if basket_ret.empty:
+        return pd.Series(dtype=float)
+    return (1.0 + basket_ret.fillna(0.0)).cumprod() * 100.0
 
 
 def plot_archetype_excess_indices(
@@ -274,6 +291,73 @@ def plot_archetype_excess_growth_rates(
         ylabel=f"trailing {window}-day excess return (%)",
         outfile=outfile,
     )
+
+
+def archetype_return_matrix(
+    brands: list[Brand],
+    series_by_ticker: dict[str, pd.Series],
+    sector_series_by_ticker: dict[str, pd.Series] | None = None,
+    excess: bool = False,
+) -> pd.DataFrame:
+    """Daily returns for every archetype basket, one column each, NaNs intact.
+
+    Feed straight into .corr() -- pandas does pairwise-complete correlation, so
+    archetypes with different history lengths (a basket with a 2021 IPO vs. one
+    with only pre-2020 members) still get a well-defined pairwise coefficient.
+    """
+    grouped = by_archetype(brands)
+    cols = {}
+    for archetype, members in grouped.items():
+        if excess:
+            r = archetype_excess_daily_return(series_by_ticker, sector_series_by_ticker or {}, members)
+        else:
+            r = archetype_daily_return(series_by_ticker, members)
+        if not r.empty:
+            cols[archetype] = r
+    return pd.DataFrame(cols).sort_index()
+
+
+# Validated diverging pair from the dataviz skill's reference palette: warm/cool
+# poles that read as opposite, neutral gray midpoint -- never a rainbow, never a
+# hue at zero.
+_DIVERGING_BLUE = "#2a78d6"
+_DIVERGING_GRAY = "#f0efec"
+_DIVERGING_RED = "#e34948"
+
+
+def plot_correlation_heatmap(corr: pd.DataFrame, title: str, outfile: str):
+    """Diverging heatmap of a correlation matrix, annotated with each coefficient."""
+    from matplotlib.colors import LinearSegmentedColormap
+
+    cmap = LinearSegmentedColormap.from_list(
+        "diverging", [_DIVERGING_BLUE, _DIVERGING_GRAY, _DIVERGING_RED]
+    )
+    labels = list(corr.columns)
+    n = len(labels)
+
+    fig, ax = plt.subplots(figsize=(0.62 * n + 3, 0.62 * n + 2.5))
+    im = ax.imshow(corr.values, cmap=cmap, vmin=-1, vmax=1)
+    ax.set_xticks(range(n))
+    ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=8)
+    ax.set_yticks(range(n))
+    ax.set_yticklabels(labels, fontsize=8)
+    for i in range(n):
+        for j in range(n):
+            val = corr.values[i, j]
+            if pd.isna(val):
+                continue
+            color = "white" if abs(val) > 0.6 else "#0b0b0b"
+            ax.text(j, i, f"{val:.2f}", ha="center", va="center", fontsize=6.5, color=color)
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar.set_label("Pearson correlation (daily returns)")
+    ax.set_title(title, fontsize=11)
+
+    fig.tight_layout()
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    path = RESULTS_DIR / outfile
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+    return path
 
 
 def plot_sun_moon_ratio(df: pd.DataFrame, outfile: str = "sun_moon_ratio.png"):

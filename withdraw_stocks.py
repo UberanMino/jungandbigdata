@@ -23,9 +23,19 @@ return* -- brand_archetype_growth_rates.png and
 brand_archetype_excess_growth_rates.png -- the discrete derivative of the
 cumulative curves, showing trend rather than cumulative level.
 
+The 12 baskets visibly move together (2020 crash, 2022 drawdown hit every
+line). That's expected -- equities share market beta -- but it means "these
+archetypes correlate" is not itself evidence of an archetype effect. The CLI
+quantifies it directly: it fetches SPY as a market benchmark, prints the
+average pairwise correlation between archetype baskets (raw and
+sector-neutralized) and each basket's correlation with the market, and renders
+brand_archetype_correlation.png / brand_archetype_excess_correlation.png --
+diverging heatmaps of the full pairwise matrix.
+
 This is the markets counterpart to analyze.py. Like the rest of the repo it is a
 pattern-*looker*, not a claim: archetype baskets are tiny, hand-picked, and
-confounded by sector -- treat any gap as a hypothesis, not a finding.
+confounded by sector and shared market beta -- treat any gap as a hypothesis,
+not a finding.
 """
 from __future__ import annotations
 
@@ -39,13 +49,29 @@ from src.stocks import get_stock_provider
 from src.visualize import (
     archetype_excess_index,
     archetype_index,
+    archetype_return_matrix,
     plot_archetype_excess_growth_rates,
     plot_archetype_excess_indices,
     plot_archetype_growth_rates,
     plot_archetype_indices,
+    plot_correlation_heatmap,
 )
 
 STOCKS_DIR = Path(__file__).resolve().parent / "data" / "stocks"
+MARKET_TICKER = "SPY"  # broad-market benchmark, not tied to any archetype/sector
+
+
+def _mean_offdiag(corr: pd.DataFrame) -> float:
+    n = len(corr)
+    if n < 2:
+        return float("nan")
+    total, count = 0.0, 0
+    for i in range(n):
+        for j in range(n):
+            if i != j and pd.notna(corr.values[i, j]):
+                total += corr.values[i, j]
+                count += 1
+    return total / count if count else float("nan")
 
 
 def _window_return(s: pd.Series) -> float | None:
@@ -85,6 +111,11 @@ def main() -> None:
             print(f"  !! {t:6s} (sector ETF)         -- no data (skipped)")
             continue
         s.rename_axis("date").to_frame("adjclose").to_csv(STOCKS_DIR / f"{t}.csv")
+
+    market_series = provider.fetch_history(MARKET_TICKER)
+    if not market_series.empty:
+        market_series.rename_axis("date").to_frame("adjclose").to_csv(STOCKS_DIR / f"{MARKET_TICKER}.csv")
+    market_ret = market_series.pct_change()
 
     # Per-brand window returns (each brand over its own available history).
     print("\nWindow return by archetype (per brand, over each brand's own history):")
@@ -130,6 +161,43 @@ def main() -> None:
         print(f"\nWrote {excess_path}")
         excess_growth_path = plot_archetype_excess_growth_rates(series, sector_series, brands, window=args.window)
         print(f"Wrote {excess_growth_path}")
+
+    # How correlated are the 12 baskets, really -- and how much of that is just
+    # shared market beta? (raw view)
+    if have:
+        raw_matrix = archetype_return_matrix(brands, series)
+        raw_corr = raw_matrix.corr()
+        avg_raw = _mean_offdiag(raw_corr)
+        print(f"\nArchetype-vs-archetype correlation (raw daily returns): "
+              f"avg pairwise = {avg_raw:+.2f}")
+        if not market_ret.empty:
+            market_corr_raw = {a: raw_matrix[a].corr(market_ret) for a in raw_matrix.columns}
+            avg_market_raw = sum(market_corr_raw.values()) / len(market_corr_raw)
+            print(f"Archetype-vs-{MARKET_TICKER} (market) correlation: avg = {avg_market_raw:+.2f}")
+        corr_path = plot_correlation_heatmap(
+            raw_corr,
+            title="Archetype basket correlation matrix (raw daily returns)",
+            outfile="brand_archetype_correlation.png",
+        )
+        print(f"Wrote {corr_path}")
+
+    # Sector-neutralized view: does controlling for sector reduce the correlation?
+    if have and have_sectors:
+        excess_matrix = archetype_return_matrix(brands, series, sector_series, excess=True)
+        excess_corr = excess_matrix.corr()
+        avg_excess = _mean_offdiag(excess_corr)
+        print(f"\nArchetype-vs-archetype correlation (sector-neutralized excess returns): "
+              f"avg pairwise = {avg_excess:+.2f}")
+        if not market_ret.empty:
+            market_corr_excess = {a: excess_matrix[a].corr(market_ret) for a in excess_matrix.columns}
+            avg_market_excess = sum(market_corr_excess.values()) / len(market_corr_excess)
+            print(f"Archetype-vs-{MARKET_TICKER} (market), excess returns: avg = {avg_market_excess:+.2f}")
+        excess_corr_path = plot_correlation_heatmap(
+            excess_corr,
+            title="Archetype basket correlation matrix (sector-neutralized excess returns)",
+            outfile="brand_archetype_excess_correlation.png",
+        )
+        print(f"Wrote {excess_corr_path}")
 
     print(f"\nPer-ticker CSVs in {STOCKS_DIR}/")
 

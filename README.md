@@ -113,6 +113,26 @@ kink in an ever-rising line.
 python withdraw_stocks.py --window 21    # ~1mo rolling instead of the ~1 quarter default
 ```
 
+**Correlation check.** All 12 archetype lines visibly move together — same
+COVID trough, same 2022 drawdown — which is exactly what shared market beta
+looks like, not evidence of an archetype effect. The run quantifies this
+directly: it fetches SPY as a market benchmark and prints each basket's average
+pairwise correlation with the other 11, plus its average correlation with SPY,
+for both the raw and sector-neutralized returns. In a recent 10y pull:
+
+| | avg pairwise archetype↔archetype | avg archetype↔SPY |
+|---|---|---|
+| Raw returns | **+0.49** | **+0.68** |
+| Sector-neutralized excess returns | **+0.03** | **−0.01** |
+
+So the raw view's cross-archetype correlation is almost entirely a shared
+market factor — once each brand's return is measured *relative to its own
+sector*, the baskets become close to independent of each other and of the
+market. This also validates that the excess-return construction is doing its
+job. Both matrices render as diverging heatmaps —
+`results/brand_archetype_correlation.png` and
+`results/brand_archetype_excess_correlation.png`.
+
 Same discipline as the rest of the repo: the baskets are small, hand-picked,
 and even sector-neutralized doesn't remove every confound (single names like
 Nvidia can still dominate a small basket) — any gap is a **hypothesis, not a
