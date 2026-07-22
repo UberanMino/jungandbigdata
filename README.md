@@ -52,6 +52,29 @@ strings you can edit and re-export.
 allows `trends.google.com`; then a live `pytrends` fetcher can replace the
 manual step.)*
 
+## A second channel: YouTube trending (this one works in the cloud env)
+
+Google Trends measures what people consciously **search for** (a pull signal).
+YouTube's trending chart measures what collective attention is actually
+**landing on** right now (a push/consumption signal) — a natural second channel
+for the same "collective attention" idea. And unlike `trends.google.com`, the
+**YouTube Data API is reachable from the managed env**; it just needs a free API
+key.
+
+```bash
+# Google Cloud console -> enable "YouTube Data API v3" -> create an API key
+export YOUTUBE_API_KEY=your_key_here
+
+python fetch_youtube.py --region US --n 100          # top 100 US -> data/youtube/*.csv
+python fetch_youtube.py --region US,GB,DE,JP --n 50  # "global-ish" (no true worldwide chart)
+```
+
+Notes: trending is **per-region** (pass ISO codes like `US`, `GB`, `DE`), the
+API returns 50 per page so the fetcher paginates, and each call costs 1 quota
+unit against the free 10,000/day. Code lives in `src/youtube.py` (library) and
+`fetch_youtube.py` (CLI). Rows carry rank, title, channel, view/like/comment
+counts, and URL.
+
 ## Method
 
 **Two channels, measured the same way.**
