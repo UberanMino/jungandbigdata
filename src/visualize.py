@@ -13,6 +13,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import pandas as pd
 
 from .brands import Brand, by_archetype
@@ -101,10 +102,16 @@ def plot_archetype_indices(
         ax.plot(s.index, s.values, lw=1.6, color=cmap(i % 20),
                 label=f"{archetype}  ({end - 100:+.0f}%)")
     ax.axhline(100, color="k", lw=0.8, ls="--", alpha=0.6)
-    ax.set_title("Brand-archetype stock indices (daily-rebalanced equal-weight, based at 100)")
-    ax.set_ylabel("index level (100 = start)")
+    # Log y-axis: equal % moves become equal vertical distances, so runaway
+    # baskets (magician) compress and the laggards stay legible.
+    ax.set_yscale("log")
+    ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(mticker.NullFormatter())
+    ax.set_yticks([50, 100, 200, 400, 800, 1600])
+    ax.set_title("Brand-archetype stock indices (daily-rebalanced equal-weight, based at 100, log scale)")
+    ax.set_ylabel("index level (100 = start, log scale)")
     ax.legend(fontsize=8, ncol=2, loc="upper left")
-    ax.grid(True, alpha=0.15)
+    ax.grid(True, which="both", alpha=0.15)
 
     fig.tight_layout()
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
