@@ -17,6 +17,14 @@
 # Uber/Coinbase/Roblox 2021, Reddit 2024, ...) -- the archetype index is a
 # daily-rebalanced equal-weight basket, so a brand simply joins its basket when
 # it starts trading rather than truncating the whole series.
+#
+# `sector` is a SPDR Select Sector ETF ticker (XLK tech, XLY consumer discret.,
+# XLP consumer staples, XLV health care, XLF financials, XLC communication
+# services, XLI industrials) used as that brand's benchmark for the
+# sector-neutralized view: excess_return = brand_return - sector_return, so an
+# archetype basket's excess index isolates "did this archetype's brands beat
+# their own industry" from "tech/growth had a good decade." XLC only exists
+# from 2018 (when GICS split it out), so its brands have a shorter benchmark.
 
 version: 1
 
@@ -24,98 +32,98 @@ archetypes:
   innocent:
     description: Purity, optimism, simple happiness; "life should be good."
     brands:
-      - {name: "Coca-Cola",        ticker: "KO"}
-      - {name: "Unilever (Dove)",  ticker: "UL"}
-      - {name: "Hershey",          ticker: "HSY"}
-      - {name: "General Mills",    ticker: "GIS"}
+      - {name: "Coca-Cola",        ticker: "KO",    sector: "XLP"}
+      - {name: "Unilever (Dove)",  ticker: "UL",    sector: "XLP"}
+      - {name: "Hershey",          ticker: "HSY",   sector: "XLP"}
+      - {name: "General Mills",    ticker: "GIS",   sector: "XLP"}
 
   everyman:
     description: Belonging, down-to-earth, no pretense; "we're all equal."
     brands:
-      - {name: "Target",           ticker: "TGT"}
-      - {name: "Home Depot",       ticker: "HD"}
-      - {name: "Walmart",          ticker: "WMT"}
-      - {name: "Levi's",           ticker: "LEVI"}
-      - {name: "Gap",              ticker: "GAP"}
+      - {name: "Target",           ticker: "TGT",   sector: "XLY"}
+      - {name: "Home Depot",       ticker: "HD",    sector: "XLY"}
+      - {name: "Walmart",          ticker: "WMT",   sector: "XLP"}
+      - {name: "Levi's",           ticker: "LEVI",  sector: "XLY"}
+      - {name: "Gap",              ticker: "GAP",   sector: "XLY"}
 
   hero:
     description: Mastery through courage and effort; "where there's a will."
     brands:
-      - {name: "Nike",             ticker: "NKE"}
-      - {name: "FedEx",            ticker: "FDX"}
-      - {name: "Under Armour",     ticker: "UAA"}
-      - {name: "Caterpillar",      ticker: "CAT"}
+      - {name: "Nike",             ticker: "NKE",   sector: "XLY"}
+      - {name: "FedEx",            ticker: "FDX",   sector: "XLI"}
+      - {name: "Under Armour",     ticker: "UAA",   sector: "XLY"}
+      - {name: "Caterpillar",      ticker: "CAT",   sector: "XLI"}
 
   outlaw:
     description: Rebellion, rule-breaking, disruption; "rules are made to break."
     brands:
-      - {name: "Harley-Davidson",  ticker: "HOG"}
-      - {name: "Tesla",            ticker: "TSLA"}
-      - {name: "Uber",             ticker: "UBER"}
-      - {name: "Coinbase",         ticker: "COIN"}
+      - {name: "Harley-Davidson",  ticker: "HOG",   sector: "XLY"}
+      - {name: "Tesla",            ticker: "TSLA",  sector: "XLY"}
+      - {name: "Uber",             ticker: "UBER",  sector: "XLI"}
+      - {name: "Coinbase",         ticker: "COIN",  sector: "XLF"}
 
   explorer:
     description: Freedom, discovery, the open road; "don't fence me in."
     brands:
-      - {name: "Airbnb",           ticker: "ABNB"}
-      - {name: "Stellantis (Jeep)", ticker: "STLA"}
-      - {name: "The North Face (VF)", ticker: "VFC"}
-      - {name: "Expedia",          ticker: "EXPE"}
-      - {name: "Booking",          ticker: "BKNG"}
+      - {name: "Airbnb",           ticker: "ABNB",  sector: "XLY"}
+      - {name: "Stellantis (Jeep)", ticker: "STLA", sector: "XLY"}
+      - {name: "The North Face (VF)", ticker: "VFC", sector: "XLY"}
+      - {name: "Expedia",          ticker: "EXPE",  sector: "XLY"}
+      - {name: "Booking",          ticker: "BKNG",  sector: "XLY"}
 
   creator:
     description: Imagination, self-expression, making things; "if you can imagine it."
     brands:
-      - {name: "Adobe",            ticker: "ADBE"}
-      - {name: "Etsy",             ticker: "ETSY"}
-      - {name: "Autodesk",         ticker: "ADSK"}
-      - {name: "Roblox",           ticker: "RBLX"}
+      - {name: "Adobe",            ticker: "ADBE",  sector: "XLK"}
+      - {name: "Etsy",             ticker: "ETSY",  sector: "XLY"}
+      - {name: "Autodesk",         ticker: "ADSK",  sector: "XLK"}
+      - {name: "Roblox",           ticker: "RBLX",  sector: "XLC"}
 
   ruler:
     description: Control, prestige, order; "power isn't everything, it's the only thing."
     brands:
-      - {name: "Microsoft",        ticker: "MSFT"}
-      - {name: "American Express", ticker: "AXP"}
-      - {name: "LVMH",             ticker: "MC.PA"}
-      - {name: "Visa",             ticker: "V"}
-      - {name: "Goldman Sachs",    ticker: "GS"}
+      - {name: "Microsoft",        ticker: "MSFT",  sector: "XLK"}
+      - {name: "American Express", ticker: "AXP",   sector: "XLF"}
+      - {name: "LVMH",             ticker: "MC.PA", sector: "XLY"}
+      - {name: "Visa",             ticker: "V",     sector: "XLF"}
+      - {name: "Goldman Sachs",    ticker: "GS",    sector: "XLF"}
 
   magician:
     description: Transformation, wonder, making dreams real; "it can happen."
     brands:
-      - {name: "Disney",           ticker: "DIS"}
-      - {name: "Apple",            ticker: "AAPL"}
-      - {name: "Nvidia",           ticker: "NVDA"}
-      - {name: "Sony",             ticker: "SONY"}
+      - {name: "Disney",           ticker: "DIS",   sector: "XLC"}
+      - {name: "Apple",            ticker: "AAPL",  sector: "XLK"}
+      - {name: "Nvidia",           ticker: "NVDA",  sector: "XLK"}
+      - {name: "Sony",             ticker: "SONY",  sector: "XLK"}
 
   lover:
     description: Intimacy, beauty, desire; "you're the only one."
     brands:
-      - {name: "Estee Lauder",     ticker: "EL"}
-      - {name: "Victoria's Secret", ticker: "VSXY"}
-      - {name: "L'Oreal",          ticker: "OR.PA"}
-      - {name: "Ulta Beauty",      ticker: "ULTA"}
+      - {name: "Estee Lauder",     ticker: "EL",    sector: "XLP"}
+      - {name: "Victoria's Secret", ticker: "VSXY", sector: "XLY"}
+      - {name: "L'Oreal",          ticker: "OR.PA", sector: "XLP"}
+      - {name: "Ulta Beauty",      ticker: "ULTA",  sector: "XLY"}
 
   caregiver:
     description: Protection, nurture, service to others; "love your neighbor."
     brands:
-      - {name: "Johnson & Johnson", ticker: "JNJ"}
-      - {name: "Campbell's",       ticker: "CPB"}
-      - {name: "Procter & Gamble", ticker: "PG"}
-      - {name: "Kimberly-Clark",   ticker: "KMB"}
+      - {name: "Johnson & Johnson", ticker: "JNJ",  sector: "XLV"}
+      - {name: "Campbell's",       ticker: "CPB",   sector: "XLP"}
+      - {name: "Procter & Gamble", ticker: "PG",    sector: "XLP"}
+      - {name: "Kimberly-Clark",   ticker: "KMB",   sector: "XLP"}
 
   jester:
     description: Fun, play, living in the moment; "you only live once."
     brands:
-      - {name: "PepsiCo",          ticker: "PEP"}
-      - {name: "Netflix",          ticker: "NFLX"}
-      - {name: "Spotify",          ticker: "SPOT"}
-      - {name: "Reddit",           ticker: "RDDT"}
+      - {name: "PepsiCo",          ticker: "PEP",   sector: "XLP"}
+      - {name: "Netflix",          ticker: "NFLX",  sector: "XLC"}
+      - {name: "Spotify",          ticker: "SPOT",  sector: "XLC"}
+      - {name: "Reddit",           ticker: "RDDT",  sector: "XLC"}
 
   sage:
     description: Truth, knowledge, understanding; "the truth will set you free."
     brands:
-      - {name: "Alphabet (Google)", ticker: "GOOGL"}
-      - {name: "IBM",              ticker: "IBM"}
-      - {name: "Thomson Reuters",  ticker: "TRI"}
-      - {name: "Pearson",          ticker: "PSO"}
+      - {name: "Alphabet (Google)", ticker: "GOOGL", sector: "XLC"}
+      - {name: "IBM",              ticker: "IBM",   sector: "XLK"}
+      - {name: "Thomson Reuters",  ticker: "TRI",   sector: "XLI"}
+      - {name: "Pearson",          ticker: "PSO",   sector: "XLC"}

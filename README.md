@@ -81,11 +81,26 @@ Over a long window many brands IPO'd only partway through (Airbnb 2020,
 Coinbase/Roblox 2021, Reddit 2024, …). The index averages the *daily returns* of
 whichever members are trading each day and compounds them, so a brand simply
 **joins its basket when it lists** instead of truncating the whole series to its
-youngest member.
+youngest member. Both index charts use a **log y-axis** so runaway baskets
+(Nvidia/Apple in *magician*) don't visually flatten the rest — equal % moves
+read as equal vertical distances at any level.
 
-Same discipline as the rest of the repo: the baskets are small, hand-picked, and
-confounded by sector (the *magician* basket is really "big tech + Nvidia") — any
-gap is a **hypothesis, not a finding**.
+**Sector-neutralized view.** The plain index answers "did this basket make
+money" — but *magician* is largely a tech bet (Apple, Nvidia), so it wins
+whenever tech does, archetype aside. `brands.yaml` also pins each brand to a
+SPDR sector ETF benchmark (`sector: XLK/XLY/XLP/...`), and the run additionally
+computes each brand's **excess return over its own sector** before building the
+basket index — isolating "beat its own industry" from "rode a sector-wide
+rally." This renders alongside the plain view as
+`results/brand_archetype_excess_indices.png`. The rankings shift once sector is
+controlled for: in a recent 10y pull, *magician* stayed on top but *sage*
+(Alphabet/IBM — just riding tech/communications beta) fell from mid-pack to
+worst, and *outlaw* and *jester* jumped up.
+
+Same discipline as the rest of the repo: the baskets are small, hand-picked,
+and even sector-neutralized doesn't remove every confound (single names like
+Nvidia can still dominate a small basket) — any gap is a **hypothesis, not a
+finding**.
 
 ## Method
 

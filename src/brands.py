@@ -21,6 +21,7 @@ class Brand:
     ticker: str
     archetype: str
     archetype_desc: str = ""
+    sector: str = ""  # SPDR Select Sector ETF ticker, this brand's benchmark
 
 
 def load_brands() -> list[Brand]:
@@ -35,9 +36,16 @@ def load_brands() -> list[Brand]:
                     ticker=b["ticker"],
                     archetype=archetype,
                     archetype_desc=desc,
+                    sector=b.get("sector", ""),
                 )
             )
     return out
+
+
+def unique_sectors(brands: list[Brand] | None = None) -> list[str]:
+    brands = brands if brands is not None else load_brands()
+    seen = dict.fromkeys(b.sector for b in brands if b.sector)
+    return list(seen)
 
 
 def by_archetype(brands: list[Brand] | None = None) -> dict[str, list[Brand]]:

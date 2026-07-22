@@ -83,6 +83,80 @@ def archetype_index(series_by_ticker: dict[str, pd.Series], members: list[Brand]
     return (1.0 + basket_ret).cumprod() * 100.0
 
 
+def archetype_excess_index(
+    series_by_ticker: dict[str, pd.Series],
+    sector_series_by_ticker: dict[str, pd.Series],
+    members: list[Brand],
+) -> pd.Series:
+    """Sector-neutralized version of archetype_index.
+
+    Each brand's daily return is replaced by its *excess* return over its own
+    SPDR sector ETF (brand.sector in brands.yaml) before the same
+    daily-rebalanced equal-weight compounding is applied. This isolates "did
+    this archetype's brands beat their own industry" from "growth/tech had a
+    good decade" -- the confound the plain archetype_index can't separate
+    (e.g. the magician basket is largely a tech bet).
+    """
+    excess_cols: dict[str, pd.Series] = {}
+    for b in members:
+        brand_s = series_by_ticker.get(b.ticker)
+        sector_s = sector_series_by_ticker.get(b.sector) if b.sector else None
+        if brand_s is None or brand_s.empty or sector_s is None or sector_s.empty:
+            continue
+        combined = pd.DataFrame({"brand": brand_s, "sector": sector_s}).sort_index().ffill()
+        excess_cols[b.ticker] = combined["brand"].pct_change() - combined["sector"].pct_change()
+    if not excess_cols:
+        return pd.Series(dtype=float)
+    frame = pd.DataFrame(excess_cols).sort_index()
+    first = frame.dropna(how="all").index.min()
+    frame = frame.loc[first:]
+    basket_ret = frame.mean(axis=1, skipna=True).fillna(0.0)
+    return (1.0 + basket_ret).cumprod() * 100.0
+
+
+def plot_archetype_excess_indices(
+    series_by_ticker: dict[str, pd.Series],
+    sector_series_by_ticker: dict[str, pd.Series],
+    brands: list[Brand],
+    outfile: str = "brand_archetype_excess_indices.png",
+):
+    """Sector-neutralized companion to plot_archetype_indices."""
+    grouped = by_archetype(brands)
+    indices = {
+        a: archetype_excess_index(series_by_ticker, sector_series_by_ticker, members)
+        for a, members in grouped.items()
+    }
+    indices = {a: s for a, s in indices.items() if not s.empty}
+    if not indices:
+        raise ValueError("no sector-matched stock series to plot")
+
+    cmap = plt.get_cmap("tab20")
+    fig, ax = plt.subplots(figsize=(14, 7))
+    for i, (archetype, s) in enumerate(sorted(indices.items())):
+        end = float(s.iloc[-1])
+        ax.plot(s.index, s.values, lw=1.6, color=cmap(i % 20),
+                label=f"{archetype}  ({end - 100:+.0f}%)")
+    ax.axhline(100, color="k", lw=0.8, ls="--", alpha=0.6)
+    ax.set_yscale("log")
+    ax.yaxis.set_major_locator(mticker.LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
+    ax.yaxis.set_major_formatter(mticker.ScalarFormatter())
+    ax.yaxis.set_minor_formatter(mticker.NullFormatter())
+    ax.set_title(
+        "Brand-archetype excess-return indices (brand return minus its own sector "
+        "ETF, daily-rebalanced equal-weight, log scale)"
+    )
+    ax.set_ylabel("cumulative excess index (100 = start, log scale)")
+    ax.legend(fontsize=8, ncol=2, loc="upper left")
+    ax.grid(True, which="both", alpha=0.15)
+
+    fig.tight_layout()
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    path = RESULTS_DIR / outfile
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+    return path
+
+
 def plot_archetype_indices(
     series_by_ticker: dict[str, pd.Series],
     brands: list[Brand],

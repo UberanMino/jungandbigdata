@@ -10,8 +10,11 @@ brand archetypes. This pulls each brand's adjusted daily price straight from
 Yahoo Finance (no API key), writes one CSV per ticker into data/stocks/, and
 renders results/brand_archetype_indices.png -- an equal-weight, rebased-to-100
 stock index per archetype -- so you can eyeball whether an archetype's basket
-has out- or under-performed. It also prints a per-brand and per-archetype
-window-return table.
+has out- or under-performed. It also fetches each brand's SPDR sector ETF
+benchmark and renders results/brand_archetype_excess_indices.png -- the same
+baskets built from *excess* return over sector, isolating "this archetype's
+brands beat their own industry" from "tech/growth had a good decade." Prints
+per-brand and per-archetype tables for both views.
 
 This is the markets counterpart to analyze.py. Like the rest of the repo it is a
 pattern-*looker*, not a claim: archetype baskets are tiny, hand-picked, and
@@ -24,9 +27,14 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.brands import by_archetype, load_brands
+from src.brands import by_archetype, load_brands, unique_sectors
 from src.stocks import get_stock_provider
-from src.visualize import archetype_index, plot_archetype_indices
+from src.visualize import (
+    archetype_excess_index,
+    archetype_index,
+    plot_archetype_excess_indices,
+    plot_archetype_indices,
+)
 
 STOCKS_DIR = Path(__file__).resolve().parent / "data" / "stocks"
 
@@ -46,7 +54,9 @@ def main() -> None:
 
     brands = load_brands()
     provider = get_stock_provider(range_=args.range, interval=args.interval)
-    print(f"Withdrawing {len(brands)} tickers live ({args.range} @ {args.interval}) ...")
+    sectors = unique_sectors(brands)
+    print(f"Withdrawing {len(brands)} tickers + {len(sectors)} sector benchmarks "
+          f"live ({args.range} @ {args.interval}) ...")
 
     series: dict[str, pd.Series] = {}
     STOCKS_DIR.mkdir(parents=True, exist_ok=True)
@@ -57,6 +67,13 @@ def main() -> None:
             print(f"  !! {b.ticker:6s} {b.name:22s} -- no data (skipped)")
             continue
         s.rename_axis("date").to_frame("adjclose").to_csv(STOCKS_DIR / f"{b.ticker}.csv")
+
+    sector_series = provider.fetch_many(sectors)
+    for t, s in sector_series.items():
+        if s.empty:
+            print(f"  !! {t:6s} (sector ETF)         -- no data (skipped)")
+            continue
+        s.rename_axis("date").to_frame("adjclose").to_csv(STOCKS_DIR / f"{t}.csv")
 
     # Per-brand window returns (each brand over its own available history).
     print("\nWindow return by archetype (per brand, over each brand's own history):")
@@ -81,9 +98,25 @@ def main() -> None:
     if have:
         path = plot_archetype_indices(series, brands)
         print(f"\nWrote {path}")
-        print(f"Per-ticker CSVs in {STOCKS_DIR}/")
     else:
         print("\nNo series withdrawn -- check network egress to query1.finance.yahoo.com")
+
+    # Sector-neutralized view: each brand's return minus its own sector ETF's.
+    have_sectors = {t: s for t, s in sector_series.items() if not s.empty}
+    if have and have_sectors:
+        excess_rows = []
+        for archetype, members in grouped.items():
+            idx = archetype_excess_index(series, sector_series, members)
+            if not idx.empty:
+                excess_rows.append((archetype, float(idx.iloc[-1]) - 100.0, len(idx)))
+        if excess_rows:
+            print("\nArchetype basket, sector-neutralized (excess over own sector ETF), best -> worst:")
+            for archetype, ret, n in sorted(excess_rows, key=lambda x: x[1], reverse=True):
+                print(f"  {archetype:10s} {ret:+8.1f}%   ({n} trading days)")
+        excess_path = plot_archetype_excess_indices(series, sector_series, brands)
+        print(f"\nWrote {excess_path}")
+
+    print(f"\nPer-ticker CSVs in {STOCKS_DIR}/")
 
 
 if __name__ == "__main__":
