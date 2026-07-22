@@ -59,23 +59,27 @@ def plot_small_multiples(series_by_key: dict[str, pd.DataFrame], outfile: str = 
     return path
 
 
-def _archetype_index(series_by_ticker: dict[str, pd.Series], members: list[Brand]) -> pd.Series:
-    """Equal-weight index of an archetype's brands, rebased to 100 at the start.
+def archetype_index(series_by_ticker: dict[str, pd.Series], members: list[Brand]) -> pd.Series:
+    """Daily-rebalanced equal-weight index of an archetype's brands, based at 100.
 
-    Each brand is rebased to 100 on the first date all present members trade,
-    then averaged -- so the line reads as "growth of an equal-weight basket of
-    this archetype's brands", comparable across archetypes regardless of price.
+    Rather than requiring every member to exist on day one (which would truncate
+    the basket to its youngest brand), we average the *daily returns* of whichever
+    members are trading each day and compound them into an index. So a brand that
+    IPOs partway through simply joins its basket from that day on -- the natural
+    way to handle staggered listings (Airbnb 2020, Coinbase 2021, Reddit 2024...).
+    Composition therefore grows over the window; the index reads as "growth of an
+    equal-weight, daily-rebalanced basket of this archetype's brands".
     """
     cols = {t: s for t, s in ((b.ticker, series_by_ticker.get(b.ticker)) for b in members)
             if s is not None and not s.empty}
     if not cols:
         return pd.Series(dtype=float)
-    frame = pd.DataFrame(cols).sort_index().dropna(how="all")
-    frame = frame.ffill().dropna()  # align to the window where every member trades
-    if frame.empty:
-        return pd.Series(dtype=float)
-    rebased = frame / frame.iloc[0] * 100.0
-    return rebased.mean(axis=1)
+    frame = pd.DataFrame(cols).sort_index()
+    frame = frame.ffill()  # carry prices over market-holiday gaps; pre-IPO stays NaN
+    first = frame.dropna(how="all").index.min()
+    frame = frame.loc[first:]
+    basket_ret = frame.pct_change().mean(axis=1, skipna=True).fillna(0.0)
+    return (1.0 + basket_ret).cumprod() * 100.0
 
 
 def plot_archetype_indices(
@@ -85,7 +89,7 @@ def plot_archetype_indices(
 ):
     """One equal-weight, rebased-to-100 stock index per brand archetype."""
     grouped = by_archetype(brands)
-    indices = {a: _archetype_index(series_by_ticker, members) for a, members in grouped.items()}
+    indices = {a: archetype_index(series_by_ticker, members) for a, members in grouped.items()}
     indices = {a: s for a, s in indices.items() if not s.empty}
     if not indices:
         raise ValueError("no stock series to plot")
@@ -97,7 +101,7 @@ def plot_archetype_indices(
         ax.plot(s.index, s.values, lw=1.6, color=cmap(i % 20),
                 label=f"{archetype}  ({end - 100:+.0f}%)")
     ax.axhline(100, color="k", lw=0.8, ls="--", alpha=0.6)
-    ax.set_title("Brand-archetype stock indices (equal-weight, rebased to 100 at window start)")
+    ax.set_title("Brand-archetype stock indices (daily-rebalanced equal-weight, based at 100)")
     ax.set_ylabel("index level (100 = start)")
     ax.legend(fontsize=8, ncol=2, loc="upper left")
     ax.grid(True, alpha=0.15)

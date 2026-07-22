@@ -64,20 +64,28 @@ Unlike Trends, live market data *does* come down in this environment — prices
 are withdrawn straight from Yahoo Finance (no API key, no extra library):
 
 ```bash
-python withdraw_stocks.py                # 2y daily prices for every tracked brand
-python withdraw_stocks.py --range 5y     # longer window (6mo, 1y, 2y, 5y, max)
+python withdraw_stocks.py                # 10y daily prices for every tracked brand
+python withdraw_stocks.py --range 5y     # shorter window (6mo, 1y, 2y, 5y, 10y, max)
 ```
 
 This pulls each brand's adjusted daily close, writes one CSV per ticker into
-`data/stocks/`, prints per-brand and per-archetype window returns, and renders
-`results/brand_archetype_indices.png` — an **equal-weight, rebased-to-100 stock
-index per archetype**, so you can eyeball whether an archetype basket has out-
-or under-performed. The brand→archetype→ticker mapping lives in **`brands.yaml`**
-(edit it freely; nothing downstream hard-codes the tickers). Prices cache to
-`data/cache/stocks/` keyed by the calendar day, so a same-day re-run is instant.
+`data/stocks/`, prints per-brand and per-archetype returns, and renders
+`results/brand_archetype_indices.png` — a **daily-rebalanced equal-weight stock
+index per archetype**, based at 100, so you can eyeball whether an archetype
+basket has out- or under-performed. The brand→archetype→ticker mapping lives in
+**`brands.yaml`** (≈4 brands per archetype; edit it freely — nothing downstream
+hard-codes the tickers). Prices cache to `data/cache/stocks/` keyed by the
+calendar day, so a same-day re-run is instant.
 
-Same discipline as the rest of the repo: the baskets are tiny, hand-picked, and
-confounded by sector — any gap is a **hypothesis, not a finding**.
+Over a long window many brands IPO'd only partway through (Airbnb 2020,
+Coinbase/Roblox 2021, Reddit 2024, …). The index averages the *daily returns* of
+whichever members are trading each day and compounds them, so a brand simply
+**joins its basket when it lists** instead of truncating the whole series to its
+youngest member.
+
+Same discipline as the rest of the repo: the baskets are small, hand-picked, and
+confounded by sector (the *magician* basket is really "big tech + Nvidia") — any
+gap is a **hypothesis, not a finding**.
 
 ## Method
 
