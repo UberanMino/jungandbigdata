@@ -152,3 +152,225 @@ def get_provider(mode: str, plant_signal: float = 0.0, geo: str = ""):
     if mode == "live":
         return LiveTrendsProvider(geo=geo)
     raise ValueError(f"unknown provider mode: {mode!r}")
+
+
+# ---------------------------------------------------------------------------
+# Full-history cluster fetcher (feeds the visualization pipeline)
+#
+# The scan pipeline above fetches short per-event windows. The pattern-hunt
+# visuals in analyze.py instead want ONE long, co-normalized 0-100 monthly
+# series per cluster spanning 2004-present -- the same thing a manual Google
+# Trends "all" export gives you. Two wrinkles make a naive single pull useless:
+#
+#   1. A single 2004-present pull degrades to *yearly* granularity (~23 points),
+#      far too coarse to see a rise in the months before an event.
+#   2. pytrends 429s hard from datacenter IPs.
+#
+# So we pull two overlapping ~11.5-year windows (which Google still returns at
+# monthly resolution), chain-rescale the later window onto the earlier one using
+# their 6-month overlap, and renormalize the stitched series back to 0-100. Each
+# raw window pull is cached to data/cache/ so a mid-run rate-limit never discards
+# progress, and any cluster we cannot pull live falls back to a manual CSV export
+# already sitting in data/trends_export/<key>.csv.
+# ---------------------------------------------------------------------------
+
+import random
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from .symbols import EXPORT_DIR, Cluster, load_clusters
+
+# A real browser UA materially reduces Google's 429 rate from datacenter hosts.
+BROWSER_UA = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    )
+}
+
+# (start, end) window edges. end=None means "today". The 6-month overlap in the
+# first half of 2015 is the anchor used to stitch the two windows onto one scale.
+FULL_HISTORY_WINDOWS: list[tuple[str, str | None]] = [
+    ("2004-01-01", "2015-06-30"),
+    ("2015-01-01", None),
+]
+
+
+def _resolve_windows() -> list[tuple[str, str]]:
+    today = date.today().isoformat()
+    return [(s, e or today) for s, e in FULL_HISTORY_WINDOWS]
+
+
+def _to_monthly(df: pd.DataFrame) -> pd.DataFrame:
+    """Collapse a raw Trends frame to a clean month-start-indexed frame.
+
+    Windows in FULL_HISTORY_WINDOWS come back monthly already, but resampling to
+    month-start makes the overlap indices line up exactly for stitching (and
+    tolerates a window that Google happens to return at weekly resolution).
+    """
+    out = df.copy()
+    out.index = pd.to_datetime(out.index)
+    out = out[[c for c in out.columns if c.lower() != "ispartial"]]
+    return out.resample("MS").mean()
+
+
+def _rescale_factor(ref: pd.Series, nxt: pd.Series) -> float:
+    """Least-squares factor f minimizing ||ref - f*nxt|| on the shared index."""
+    overlap = ref.index.intersection(nxt.index)
+    if len(overlap) == 0:
+        return 1.0
+    a, b = ref.loc[overlap].to_numpy(float), nxt.loc[overlap].to_numpy(float)
+    denom = float((b * b).sum())
+    if denom > 0:
+        return float((a * b).sum()) / denom
+    # Degenerate overlap (later window ~0 there): fall back to a mean ratio.
+    return float(a.mean() / b.mean()) if b.mean() > 0 else 1.0
+
+
+def _stitch(windows: list[pd.DataFrame]) -> pd.DataFrame:
+    """Chain-rescale later windows onto the first and renormalize to 0-100.
+
+    All columns of a window share one factor, so within-window relationships
+    (e.g. the sun/moon ratio) are preserved exactly across the seam.
+    """
+    ref = _to_monthly(windows[0])
+    for raw in windows[1:]:
+        nxt = _to_monthly(raw)
+        # Use combined column magnitude so multi-term pairs stitch on total level.
+        f = _rescale_factor(ref.sum(axis=1), nxt.sum(axis=1))
+        nxt = nxt * f
+        new_idx = nxt.index.difference(ref.index)
+        ref = pd.concat([ref, nxt.loc[new_idx]]).sort_index()
+    peak = float(ref.to_numpy(float).max())
+    if peak > 0:
+        ref = ref / peak * 100.0
+    return ref
+
+
+def _write_export(path: Path, df: pd.DataFrame, region: str = "Worldwide") -> None:
+    """Write a stitched frame in Google-Trends 'Interest over time' CSV format.
+
+    trends_import.read_export skips any preamble before the Month header row, so
+    the provenance comment is safely ignored by the importer.
+    """
+    header = "Month," + ",".join(f"{c}: ({region})" for c in df.columns)
+    lines = [
+        "# source: live pytrends, stitched 2004-present monthly (src/trends.py)",
+        "Category: All categories",
+        "",
+        header,
+    ]
+    for ts, row in df.iterrows():
+        cells = ",".join("" if pd.isna(v) else str(int(round(float(v)))) for v in row)
+        lines.append(f"{ts.strftime('%Y-%m')},{cells}")
+    path.write_text("\n".join(lines) + "\n")
+
+
+@dataclass
+class FetchReport:
+    live: list[str] = field(default_factory=list)          # pulled fresh from Trends
+    manual_fallback: list[str] = field(default_factory=list)  # live failed, used existing CSV
+    needs_manual: list[str] = field(default_factory=list)   # live failed, no CSV present
+
+    def summary(self) -> str:
+        def line(label, keys):
+            return f"{label} ({len(keys)}): " + (", ".join(keys) if keys else "-")
+        return "\n".join([
+            line("live-fetched", self.live),
+            line("manual fallback used", self.manual_fallback),
+            line("STILL NEEDS MANUAL EXPORT", self.needs_manual),
+        ])
+
+
+class FullHistoryFetcher:
+    """Pull one co-normalized 2004-present monthly series per cluster.
+
+    Politely rate-limited with exponential backoff on 429s. Per-window caching
+    (data/cache/) makes runs resumable; per-cluster manual-CSV fallback keeps a
+    throttled run from failing wholesale.
+    """
+
+    def __init__(
+        self,
+        geo: str = "",
+        hl: str = "en-US",
+        pause: float = 25.0,      # polite gap between successful live pulls
+        backoff: float = 30.0,    # base wait after a rate-limit, grows exponentially
+        tries: int = 5,
+        export_dir: Path = EXPORT_DIR,
+    ):
+        self.geo = geo
+        self.hl = hl
+        self.pause = pause
+        self.backoff = backoff
+        self.tries = tries
+        self.export_dir = export_dir
+        self.windows = _resolve_windows()
+
+    def _cache_path(self, key: str, wi: int) -> Path:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        return CACHE_DIR / f"{key}__w{wi}_{self.geo or 'worldwide'}.csv"
+
+    def _pull_window(self, terms: list[str], start: str, end: str) -> pd.DataFrame:
+        from pytrends.request import TrendReq
+
+        timeframe = f"{start} {end}"
+        last = None
+        for attempt in range(self.tries):
+            try:
+                client = TrendReq(hl=self.hl, tz=0, requests_args={"headers": BROWSER_UA})
+                client.build_payload(terms, timeframe=timeframe, geo=self.geo)
+                df = client.interest_over_time()
+                if df is None or df.empty:
+                    return pd.DataFrame()
+                return df
+            except Exception as exc:  # pytrends raises a grab-bag; 429 is the common one
+                last = exc
+                wait = self.backoff * (2 ** attempt) + random.uniform(0, 5)
+                print(f"    [{terms}] {start}..{end} attempt {attempt+1}/{self.tries} "
+                      f"failed ({type(exc).__name__}); backing off {wait:.0f}s", flush=True)
+                time.sleep(wait)
+        raise RuntimeError(f"all {self.tries} attempts failed: {last}")
+
+    def _fetch_cluster(self, cluster: Cluster) -> pd.DataFrame | None:
+        raws: list[pd.DataFrame] = []
+        for wi, (start, end) in enumerate(self.windows):
+            cache = self._cache_path(cluster.key, wi)
+            if cache.exists():
+                raw = pd.read_csv(cache, parse_dates=["date"]).set_index("date")
+                print(f"    [{cluster.key}] window {wi} from cache ({len(raw)} rows)", flush=True)
+            else:
+                time.sleep(self.pause + random.uniform(0, 5))  # rate-limit before a live hit
+                raw = self._pull_window(cluster.queries, start, end)
+                if raw.empty:
+                    return None
+                raw.rename_axis("date").to_csv(cache)
+                print(f"    [{cluster.key}] window {wi} pulled live ({len(raw)} rows)", flush=True)
+            raws.append(raw)
+        return _stitch(raws)
+
+    def run(self, only: list[str] | None = None) -> FetchReport:
+        report = FetchReport()
+        self.export_dir.mkdir(parents=True, exist_ok=True)
+        clusters = [c for c in load_clusters() if only is None or c.key in only]
+        for cluster in clusters:
+            print(f"[{cluster.key}] {cluster.label} :: {cluster.queries}", flush=True)
+            export_csv = self.export_dir / f"{cluster.key}.csv"
+            try:
+                stitched = self._fetch_cluster(cluster)
+            except Exception as exc:
+                print(f"    -> live fetch failed: {exc}", flush=True)
+                stitched = None
+            if stitched is not None and not stitched.empty:
+                # Name columns after the actual queries so the importer/legend read right.
+                stitched.columns = list(cluster.queries)
+                _write_export(export_csv, stitched)
+                report.live.append(cluster.key)
+                print(f"    -> wrote {export_csv} ({len(stitched)} months)", flush=True)
+            elif export_csv.exists():
+                report.manual_fallback.append(cluster.key)
+                print(f"    -> using existing manual export {export_csv}", flush=True)
+            else:
+                report.needs_manual.append(cluster.key)
+                print(f"    -> NO data; needs manual export -> {export_csv}", flush=True)
+        return report
