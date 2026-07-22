@@ -195,6 +195,87 @@ def plot_archetype_indices(
     return path
 
 
+def _rolling_return(idx: pd.Series, window: int) -> pd.Series:
+    """Trailing `window`-trading-day % change of an index level -- the index's
+    discrete derivative. Smoother than day-over-day return, and unlike the
+    cumulative index it isn't anchored to the (somewhat arbitrary) 2016 start:
+    it answers "how is this basket trending lately", not "how far has it come"."""
+    return idx.pct_change(periods=window) * 100.0
+
+
+def _plot_growth_rates(
+    indices: dict[str, pd.Series],
+    window: int,
+    title: str,
+    ylabel: str,
+    outfile: str,
+):
+    rates = {a: _rolling_return(s, window).dropna() for a, s in indices.items()}
+    rates = {a: r for a, r in rates.items() if not r.empty}
+    if not rates:
+        raise ValueError("no series long enough for this rolling window")
+
+    cmap = plt.get_cmap("tab20")
+    fig, ax = plt.subplots(figsize=(14, 7))
+    for i, (archetype, r) in enumerate(sorted(rates.items())):
+        latest = float(r.iloc[-1])
+        ax.plot(r.index, r.values, lw=1.3, color=cmap(i % 20),
+                label=f"{archetype}  (now {latest:+.0f}%)")
+    ax.axhline(0, color="k", lw=0.8, ls="--", alpha=0.6)
+    ax.set_title(title)
+    ax.set_ylabel(ylabel)
+    ax.legend(fontsize=8, ncol=2, loc="upper left")
+    ax.grid(True, alpha=0.15)
+
+    fig.tight_layout()
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    path = RESULTS_DIR / outfile
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+    return path
+
+
+def plot_archetype_growth_rates(
+    series_by_ticker: dict[str, pd.Series],
+    brands: list[Brand],
+    window: int = 63,
+    outfile: str = "brand_archetype_growth_rates.png",
+):
+    """Rolling `window`-day return of each archetype's raw index -- its trend."""
+    grouped = by_archetype(brands)
+    indices = {a: archetype_index(series_by_ticker, members) for a, members in grouped.items()}
+    months = window / 21
+    return _plot_growth_rates(
+        indices, window,
+        title=f"Brand-archetype trailing {window}-trading-day return (~{months:.0f}mo rolling)",
+        ylabel=f"trailing {window}-day return (%)",
+        outfile=outfile,
+    )
+
+
+def plot_archetype_excess_growth_rates(
+    series_by_ticker: dict[str, pd.Series],
+    sector_series_by_ticker: dict[str, pd.Series],
+    brands: list[Brand],
+    window: int = 63,
+    outfile: str = "brand_archetype_excess_growth_rates.png",
+):
+    """Rolling `window`-day return of each archetype's sector-neutralized index."""
+    grouped = by_archetype(brands)
+    indices = {
+        a: archetype_excess_index(series_by_ticker, sector_series_by_ticker, members)
+        for a, members in grouped.items()
+    }
+    months = window / 21
+    return _plot_growth_rates(
+        indices, window,
+        title=(f"Brand-archetype trailing {window}-trading-day EXCESS return "
+               f"(vs. own sector, ~{months:.0f}mo rolling)"),
+        ylabel=f"trailing {window}-day excess return (%)",
+        outfile=outfile,
+    )
+
+
 def plot_sun_moon_ratio(df: pd.DataFrame, outfile: str = "sun_moon_ratio.png"):
     """Sun/Moon co-normalized levels and their ratio over time."""
     events = load_events()

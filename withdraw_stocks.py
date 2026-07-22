@@ -16,6 +16,13 @@ baskets built from *excess* return over sector, isolating "this archetype's
 brands beat their own industry" from "tech/growth had a good decade." Prints
 per-brand and per-archetype tables for both views.
 
+Both cumulative indices are anchored to the (somewhat arbitrary) start of the
+window, so "how much has this basket gained since 2016" can obscure "how is it
+doing lately." The CLI also renders each index's *rolling `--window`-day
+return* -- brand_archetype_growth_rates.png and
+brand_archetype_excess_growth_rates.png -- the discrete derivative of the
+cumulative curves, showing trend rather than cumulative level.
+
 This is the markets counterpart to analyze.py. Like the rest of the repo it is a
 pattern-*looker*, not a claim: archetype baskets are tiny, hand-picked, and
 confounded by sector -- treat any gap as a hypothesis, not a finding.
@@ -32,7 +39,9 @@ from src.stocks import get_stock_provider
 from src.visualize import (
     archetype_excess_index,
     archetype_index,
+    plot_archetype_excess_growth_rates,
     plot_archetype_excess_indices,
+    plot_archetype_growth_rates,
     plot_archetype_indices,
 )
 
@@ -50,6 +59,8 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--range", default="10y", help="history window (e.g. 6mo, 1y, 2y, 5y, 10y, max)")
     ap.add_argument("--interval", default="1d", help="bar interval (1d, 1wk, 1mo)")
+    ap.add_argument("--window", type=int, default=63,
+                     help="rolling window in trading days for the growth-rate charts (default 63 ~= 1 quarter)")
     args = ap.parse_args()
 
     brands = load_brands()
@@ -98,6 +109,8 @@ def main() -> None:
     if have:
         path = plot_archetype_indices(series, brands)
         print(f"\nWrote {path}")
+        growth_path = plot_archetype_growth_rates(series, brands, window=args.window)
+        print(f"Wrote {growth_path}")
     else:
         print("\nNo series withdrawn -- check network egress to query1.finance.yahoo.com")
 
@@ -115,6 +128,8 @@ def main() -> None:
                 print(f"  {archetype:10s} {ret:+8.1f}%   ({n} trading days)")
         excess_path = plot_archetype_excess_indices(series, sector_series, brands)
         print(f"\nWrote {excess_path}")
+        excess_growth_path = plot_archetype_excess_growth_rates(series, sector_series, brands, window=args.window)
+        print(f"Wrote {excess_growth_path}")
 
     print(f"\nPer-ticker CSVs in {STOCKS_DIR}/")
 

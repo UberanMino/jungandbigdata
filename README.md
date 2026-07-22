@@ -97,6 +97,22 @@ controlled for: in a recent 10y pull, *magician* stayed on top but *sage*
 (Alphabet/IBM — just riding tech/communications beta) fell from mid-pack to
 worst, and *outlaw* and *jester* jumped up.
 
+**Growth-rate (derivative) view.** Both cumulative indices are anchored to the
+window's start, so "up 1193% since 2016" tells you nothing about whether
+*magician* is hot *right now* versus coasting on an old rally. The run also
+computes each index's **rolling `--window`-trading-day return** (default 63 ≈
+one quarter; `--window 21` ≈ one month) — the discrete derivative of the
+cumulative curve — and renders it as `results/brand_archetype_growth_rates.png`
+(raw) and `results/brand_archetype_excess_growth_rates.png`
+(sector-neutralized). These read as "which archetype is accelerating lately",
+not "which has grown the most since inception", and make the COVID-crash and
+2022 drawdown show up as a shared trough across every basket rather than a
+kink in an ever-rising line.
+
+```bash
+python withdraw_stocks.py --window 21    # ~1mo rolling instead of the ~1 quarter default
+```
+
 Same discipline as the rest of the repo: the baskets are small, hand-picked,
 and even sector-neutralized doesn't remove every confound (single names like
 Nvidia can still dominate a small basket) — any gap is a **hypothesis, not a
