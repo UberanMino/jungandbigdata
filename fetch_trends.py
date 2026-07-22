@@ -29,9 +29,9 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--geo", default="", help="region code, e.g. US (default worldwide)")
     ap.add_argument("--only", nargs="*", default=None, help="restrict to these cluster keys")
-    ap.add_argument("--pause", type=float, default=25.0, help="seconds between live pulls")
-    ap.add_argument("--backoff", type=float, default=30.0, help="base backoff after a 429")
-    ap.add_argument("--tries", type=int, default=5, help="attempts per window before giving up")
+    ap.add_argument("--pause", type=float, default=8.0, help="seconds between live pulls")
+    ap.add_argument("--backoff", type=float, default=10.0, help="base backoff after a 429 (gentle, capped)")
+    ap.add_argument("--tries", type=int, default=8, help="attempts per window before giving up")
     args = ap.parse_args()
 
     fetcher = FullHistoryFetcher(

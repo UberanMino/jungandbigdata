@@ -294,15 +294,17 @@ class FullHistoryFetcher:
         self,
         geo: str = "",
         hl: str = "en-US",
-        pause: float = 25.0,      # polite gap between successful live pulls
-        backoff: float = 30.0,    # base wait after a rate-limit, grows exponentially
-        tries: int = 5,
+        pause: float = 8.0,       # polite gap between successful live pulls
+        backoff: float = 10.0,    # base wait after a rate-limit; grows gently, capped
+        backoff_cap: float = 75.0,
+        tries: int = 8,
         export_dir: Path = EXPORT_DIR,
     ):
         self.geo = geo
         self.hl = hl
         self.pause = pause
         self.backoff = backoff
+        self.backoff_cap = backoff_cap
         self.tries = tries
         self.export_dir = export_dir
         self.windows = _resolve_windows()
@@ -326,7 +328,10 @@ class FullHistoryFetcher:
                 return df
             except Exception as exc:  # pytrends raises a grab-bag; 429 is the common one
                 last = exc
-                wait = self.backoff * (2 ** attempt) + random.uniform(0, 5)
+                # 429s here are transient, not bans -- a short retry usually clears
+                # them, so grow gently and cap so a flaky pull costs seconds not
+                # minutes. (Empirically a long exponential wait was pure dead time.)
+                wait = min(self.backoff * (1.6 ** attempt), self.backoff_cap) + random.uniform(0, 4)
                 print(f"    [{terms}] {start}..{end} attempt {attempt+1}/{self.tries} "
                       f"failed ({type(exc).__name__}); backing off {wait:.0f}s", flush=True)
                 time.sleep(wait)
