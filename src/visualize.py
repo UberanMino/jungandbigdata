@@ -15,6 +15,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from .brands import Brand, by_archetype
 from .ontology import load_events
 from .symbols import load_clusters
 
@@ -51,6 +52,57 @@ def plot_small_multiples(series_by_key: dict[str, pd.DataFrame], outfile: str = 
 
     fig.suptitle("Symbol search interest vs. world events (red lines = events)", fontsize=12)
     fig.tight_layout(rect=(0, 0, 1, 0.98))
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    path = RESULTS_DIR / outfile
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+    return path
+
+
+def _archetype_index(series_by_ticker: dict[str, pd.Series], members: list[Brand]) -> pd.Series:
+    """Equal-weight index of an archetype's brands, rebased to 100 at the start.
+
+    Each brand is rebased to 100 on the first date all present members trade,
+    then averaged -- so the line reads as "growth of an equal-weight basket of
+    this archetype's brands", comparable across archetypes regardless of price.
+    """
+    cols = {t: s for t, s in ((b.ticker, series_by_ticker.get(b.ticker)) for b in members)
+            if s is not None and not s.empty}
+    if not cols:
+        return pd.Series(dtype=float)
+    frame = pd.DataFrame(cols).sort_index().dropna(how="all")
+    frame = frame.ffill().dropna()  # align to the window where every member trades
+    if frame.empty:
+        return pd.Series(dtype=float)
+    rebased = frame / frame.iloc[0] * 100.0
+    return rebased.mean(axis=1)
+
+
+def plot_archetype_indices(
+    series_by_ticker: dict[str, pd.Series],
+    brands: list[Brand],
+    outfile: str = "brand_archetype_indices.png",
+):
+    """One equal-weight, rebased-to-100 stock index per brand archetype."""
+    grouped = by_archetype(brands)
+    indices = {a: _archetype_index(series_by_ticker, members) for a, members in grouped.items()}
+    indices = {a: s for a, s in indices.items() if not s.empty}
+    if not indices:
+        raise ValueError("no stock series to plot")
+
+    cmap = plt.get_cmap("tab20")
+    fig, ax = plt.subplots(figsize=(14, 7))
+    for i, (archetype, s) in enumerate(sorted(indices.items())):
+        end = float(s.iloc[-1])
+        ax.plot(s.index, s.values, lw=1.6, color=cmap(i % 20),
+                label=f"{archetype}  ({end - 100:+.0f}%)")
+    ax.axhline(100, color="k", lw=0.8, ls="--", alpha=0.6)
+    ax.set_title("Brand-archetype stock indices (equal-weight, rebased to 100 at window start)")
+    ax.set_ylabel("index level (100 = start)")
+    ax.legend(fontsize=8, ncol=2, loc="upper left")
+    ax.grid(True, alpha=0.15)
+
+    fig.tight_layout()
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     path = RESULTS_DIR / outfile
     fig.savefig(path, dpi=130)

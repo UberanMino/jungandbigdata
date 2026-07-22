@@ -52,6 +52,33 @@ strings you can edit and re-export.
 allows `trends.google.com`; then a live `pytrends` fetcher can replace the
 manual step.)*
 
+## Brand archetypes in markets (live stock withdrawal)
+
+The same archetype idea has a marketing-world descendant: modern brands are
+deliberately built on one of the **twelve Jungian brand archetypes** (Mark &
+Pearson, *The Hero and the Outlaw*) — Hero, Outlaw, Magician, Sage, Ruler,
+Lover, and so on. So a companion question is whether a brand's archetype tracks
+its **stock price**.
+
+Unlike Trends, live market data *does* come down in this environment — prices
+are withdrawn straight from Yahoo Finance (no API key, no extra library):
+
+```bash
+python withdraw_stocks.py                # 2y daily prices for every tracked brand
+python withdraw_stocks.py --range 5y     # longer window (6mo, 1y, 2y, 5y, max)
+```
+
+This pulls each brand's adjusted daily close, writes one CSV per ticker into
+`data/stocks/`, prints per-brand and per-archetype window returns, and renders
+`results/brand_archetype_indices.png` — an **equal-weight, rebased-to-100 stock
+index per archetype**, so you can eyeball whether an archetype basket has out-
+or under-performed. The brand→archetype→ticker mapping lives in **`brands.yaml`**
+(edit it freely; nothing downstream hard-codes the tickers). Prices cache to
+`data/cache/stocks/` keyed by the calendar day, so a same-day re-run is instant.
+
+Same discipline as the rest of the repo: the baskets are tiny, hand-picked, and
+confounded by sector — any gap is a **hypothesis, not a finding**.
+
 ## Method
 
 **Two channels, measured the same way.**
@@ -103,6 +130,15 @@ src/symbols.py                  cluster loader + explore-URL builder
 src/trends_import.py            reads Google Trends CSV exports into tidy frames
 src/visualize.py                small-multiple series + event overlays + sun/moon ratio
 analyze.py                      CLI: import exports -> results/*.png
+```
+
+Brand-archetypes-in-markets path (live, no key needed):
+
+```
+brands.yaml                     the twelve brand archetypes -> tickers (edit here)
+src/brands.py                   brand loader + archetype grouping
+src/stocks.py                   live Yahoo Finance provider (adjusted close, cached)
+withdraw_stocks.py              CLI: pull live prices -> data/stocks/ + results/*.png
 ```
 
 Optional statistical follow-up (for when a pattern looks worth pressure-testing):

@@ -1,0 +1,91 @@
+# Brand archetypes -> publicly-traded tickers.
+#
+# The premise: modern brands are deliberately built on one of the twelve
+# Jungian *brand* archetypes (Mark & Pearson, "The Hero and the Outlaw"), the
+# marketing-world descendant of Jung's archetypes. This file pins each archetype
+# to a few well-known, US-listed companies whose brand identity leans on it, so
+# their *stock prices* can be withdrawn live and grouped by archetype.
+#
+# This is an exploratory mapping and, like ontology/archetypes.yaml, a judgment
+# call on purpose -- versioned and human-readable so you can argue with it and
+# re-pull. A brand can carry more than one archetype; it is listed under its
+# dominant public identity. Nothing downstream hard-codes these; edit freely.
+#
+# Ticker note: US symbols resolve cleanly on the live provider. Non-US listings
+# use their Yahoo suffix (e.g. MC.PA for LVMH on Euronext Paris).
+
+version: 1
+
+archetypes:
+  innocent:
+    description: Purity, optimism, simple happiness; "life should be good."
+    brands:
+      - {name: "Coca-Cola",        ticker: "KO"}
+      - {name: "Unilever (Dove)",  ticker: "UL"}
+
+  everyman:
+    description: Belonging, down-to-earth, no pretense; "we're all equal."
+    brands:
+      - {name: "Target",           ticker: "TGT"}
+      - {name: "Home Depot",       ticker: "HD"}
+
+  hero:
+    description: Mastery through courage and effort; "where there's a will."
+    brands:
+      - {name: "Nike",             ticker: "NKE"}
+      - {name: "FedEx",            ticker: "FDX"}
+
+  outlaw:
+    description: Rebellion, rule-breaking, disruption; "rules are made to break."
+    brands:
+      - {name: "Harley-Davidson",  ticker: "HOG"}
+      - {name: "Tesla",            ticker: "TSLA"}
+
+  explorer:
+    description: Freedom, discovery, the open road; "don't fence me in."
+    brands:
+      - {name: "Airbnb",           ticker: "ABNB"}
+      - {name: "Stellantis (Jeep)", ticker: "STLA"}
+
+  creator:
+    description: Imagination, self-expression, making things; "if you can imagine it."
+    brands:
+      - {name: "Adobe",            ticker: "ADBE"}
+      - {name: "Etsy",             ticker: "ETSY"}
+
+  ruler:
+    description: Control, prestige, order; "power isn't everything, it's the only thing."
+    brands:
+      - {name: "Microsoft",        ticker: "MSFT"}
+      - {name: "American Express", ticker: "AXP"}
+      - {name: "LVMH",             ticker: "MC.PA"}
+
+  magician:
+    description: Transformation, wonder, making dreams real; "it can happen."
+    brands:
+      - {name: "Disney",           ticker: "DIS"}
+      - {name: "Apple",            ticker: "AAPL"}
+
+  lover:
+    description: Intimacy, beauty, desire; "you're the only one."
+    brands:
+      - {name: "Estee Lauder",     ticker: "EL"}
+      - {name: "Victoria's Secret", ticker: "VSXY"}
+
+  caregiver:
+    description: Protection, nurture, service to others; "love your neighbor."
+    brands:
+      - {name: "Johnson & Johnson", ticker: "JNJ"}
+      - {name: "Campbell's",       ticker: "CPB"}
+
+  jester:
+    description: Fun, play, living in the moment; "you only live once."
+    brands:
+      - {name: "PepsiCo",          ticker: "PEP"}
+      - {name: "Netflix",          ticker: "NFLX"}
+
+  sage:
+    description: Truth, knowledge, understanding; "the truth will set you free."
+    brands:
+      - {name: "Alphabet (Google)", ticker: "GOOGL"}
+      - {name: "IBM",              ticker: "IBM"}

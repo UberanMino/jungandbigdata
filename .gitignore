@@ -4,6 +4,7 @@ __pycache__/
 venv/
 env/
 data/cache/
+data/stocks/
 results/*.png
 results/*.csv
 .ipynb_checkpoints/
