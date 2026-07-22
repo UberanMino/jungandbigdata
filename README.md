@@ -90,6 +90,26 @@ looked at.
 pre-registered follow-up**, not a finding. The broad scan is a
 hypothesis-*generator*.
 
+## YouTube daily trending (auxiliary data source)
+
+Separate from the Trends pattern-hunt: `fetch_youtube_trending.py` pulls the
+top N videos on YouTube's regional "trending" (`chart=mostPopular`) list via
+the YouTube Data API v3 and writes a dated CSV snapshot.
+
+```bash
+export YOUTUBE_API_KEY=...    # from https://console.cloud.google.com/apis/credentials
+                               # (enable "YouTube Data API v3" on the project first)
+python fetch_youtube_trending.py                  # top 100, region US, today's date
+python fetch_youtube_trending.py --region GB --top 50
+```
+
+Each run writes `data/youtube_trending/<region>_<date>.csv` with rank, video
+ID/title/channel, publish time, view/like/comment counts, duration, tags, and
+URL. The API paginates at 50 results/page, so "top 100" costs two requests.
+Trending is inherently region-scoped -- there's no single global chart, hence
+`--region` (ISO 3166-1 alpha-2, default `US`). Run it daily (e.g. via cron) to
+build a time series of snapshots.
+
 ## Layout
 
 Active pattern-hunt path (start here):
@@ -103,6 +123,9 @@ src/symbols.py                  cluster loader + explore-URL builder
 src/trends_import.py            reads Google Trends CSV exports into tidy frames
 src/visualize.py                small-multiple series + event overlays + sun/moon ratio
 analyze.py                      CLI: import exports -> results/*.png
+
+src/youtube_trending.py         YouTube Data API v3 client (mostPopular chart)
+fetch_youtube_trending.py       CLI: fetch top-N trending -> data/youtube_trending/*.csv
 ```
 
 Optional statistical follow-up (for when a pattern looks worth pressure-testing):
