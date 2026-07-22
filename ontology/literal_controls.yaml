@@ -1,0 +1,23 @@
+# Event-category -> literal control terms.
+#
+# These are the plain, on-the-nose things people consciously search when an
+# event is brewing or breaking. They represent the "news-coverage / information
+# flow" channel. The whole Jungian hypothesis only gets interesting if the
+# SYMBOLIC channel (ontology/archetypes.yaml) shows pre-event lift that the
+# LITERAL channel does not already explain -- so we measure both and report the
+# contrast (symbolic lift minus literal lift).
+
+version: 1
+categories:
+  financial:
+    literal: [recession, stock market crash, unemployment, layoffs]
+  pandemic:
+    literal: [pandemic, virus outbreak, quarantine, vaccine]
+  war:
+    literal: [war, invasion, military conflict, ceasefire]
+  natural_disaster:
+    literal: [earthquake, hurricane, tsunami, disaster relief]
+  terror:
+    literal: [terror attack, bombing, mass shooting]
+  political:
+    literal: [election, protest, coup, referendum]

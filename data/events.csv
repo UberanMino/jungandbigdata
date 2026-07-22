@@ -1,0 +1,21 @@
+date,name,category,notes
+2004-12-26,Indian Ocean tsunami,natural_disaster,~230k deaths across 14 countries
+2005-08-29,Hurricane Katrina,natural_disaster,New Orleans levee failures
+2008-05-12,Sichuan earthquake,natural_disaster,~87k dead/missing
+2008-09-15,Lehman Brothers collapse,financial,Global financial crisis peak
+2009-04-24,H1N1 swine flu emergence,pandemic,WHO began tracking novel H1N1
+2010-04-20,Deepwater Horizon spill,natural_disaster,Gulf of Mexico oil disaster
+2010-12-17,Arab Spring begins,political,Bouazizi self-immolation in Tunisia
+2011-03-11,Tohoku earthquake / Fukushima,natural_disaster,Quake tsunami and nuclear meltdown
+2012-10-29,Hurricane Sandy,natural_disaster,US East Coast landfall
+2014-03-23,West Africa Ebola outbreak,pandemic,WHO first reports in Guinea
+2015-11-13,Paris attacks,terror,Coordinated attacks across Paris
+2016-06-23,Brexit referendum,political,UK votes to leave the EU
+2016-11-08,US presidential election,political,2016 general election
+2019-06-09,Hong Kong protests escalate,political,Anti-extradition-bill mass protests
+2020-03-11,COVID-19 pandemic declared,pandemic,WHO declares a pandemic
+2021-01-06,US Capitol attack,political,Storming of the US Capitol
+2022-02-24,Russia invades Ukraine,war,Full-scale invasion begins
+2023-02-06,Turkey-Syria earthquake,natural_disaster,~55k deaths
+2023-03-10,Silicon Valley Bank collapse,financial,Largest US bank failure since 2008
+2023-10-07,Israel-Hamas war begins,war,Hamas attack and subsequent war

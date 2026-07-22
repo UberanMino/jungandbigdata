@@ -1,0 +1,14 @@
+# Neutral control terms with (ideally) no archetypal charge.
+# Their pre-event "lift" should be indistinguishable from noise. If placebo
+# terms light up as strongly as symbolic terms, our detector is measuring
+# artifacts, not signal.
+chair
+table
+pencil
+coffee
+umbrella
+bicycle
+sandwich
+envelope
+curtain
+spoon

@@ -1,0 +1,57 @@
+# Archetype -> symbolic search-term ontology.
+#
+# This is the most judgment-heavy, observer-dependent part of the whole project.
+# It is deliberately versioned and human-readable so that the mapping from a
+# Jungian archetype to a set of *measurable* Google Trends queries is explicit
+# and arguable, not hidden inside code.
+#
+# `symbolic` terms are abstract / mythic expressions of the archetype -- the
+# channel we actually care about. They should NOT be literal descriptions of a
+# world event (those live in ontology/literal_controls.yaml and act as the
+# "boring news-coverage" control the symbolic channel must beat).
+#
+# Caveat baked in on purpose: many of these words are polysemous ("shadow",
+# "tower", "flood"). Ambiguity inflates noise and is one reason we lean on null
+# models rather than raw correlations.
+
+version: 1
+archetypes:
+  shadow:
+    description: The repressed, disowned, dark side of the psyche.
+    symbolic: [shadow, darkness, demon, monster, the abyss, nightmare]
+
+  apocalypse:
+    description: Dissolution / end-of-world imagery; the flood that wipes clean.
+    symbolic: [apocalypse, the flood, deluge, end of the world, tower falling, drowning]
+
+  rebirth:
+    description: Death-and-renewal; transformation into a new state.
+    symbolic: [phoenix, rebirth, resurrection, ashes, new dawn]
+
+  self:
+    description: Wholeness, the integrated center of the psyche.
+    symbolic: [mandala, wholeness, the circle, ouroboros, inner light]
+
+  trickster:
+    description: Chaos, inversion, the boundary-breaker and shapeshifter.
+    symbolic: [trickster, jester, chaos, the mask, shapeshifter]
+
+  hero:
+    description: The ego's journey through ordeal toward transformation.
+    symbolic: [the hero, the quest, slaying the dragon, the ordeal]
+
+  great_mother:
+    description: Nurturing/devouring source; earth, ocean, womb and grave.
+    symbolic: [mother earth, the womb, gaia, the deep sea]
+
+  wise_old_man:
+    description: Meaning, guidance, the voice that appears in crisis.
+    symbolic: [the sage, the oracle, prophecy, the hermit]
+
+  serpent:
+    description: Primal energy, temptation, transformation, the underworld.
+    symbolic: [the serpent, the snake, venom, shedding skin]
+
+  death:
+    description: Endings, the underworld crossing, mortality made vivid.
+    symbolic: [the reaper, mortality, the underworld, the void]
