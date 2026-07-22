@@ -26,6 +26,32 @@ about what it is not:
   unconscious. So we separate two channels and only care when the symbolic one
   adds something the literal one doesn't.
 
+## Getting the data (Google Trends is blocked in the cloud env)
+
+This repo runs in a managed environment whose egress policy **blocks
+`trends.google.com`**, so automated pulls (`pytrends`) fail with a proxy 403.
+The pattern hunt therefore uses a **manual export** flow:
+
+```bash
+python make_export_links.py          # writes data/trends_export/EXPORT_LINKS.md
+```
+
+Open each generated link, click the download (↓) icon on the **Interest over
+time** card, and save the CSV into `data/trends_export/` under the filename the
+table gives (e.g. `serpent_snake.csv`). Then:
+
+```bash
+python analyze.py                    # imports whatever CSVs are present -> results/
+```
+
+`analyze.py` tells you which clusters still need exporting, so you can do them a
+few at a time. The tracked symbols live in **`symbols.yaml`** — plain query
+strings you can edit and re-export.
+
+*(To automate instead: recreate the environment with a network policy that
+allows `trends.google.com`; then a live `pytrends` fetcher can replace the
+manual step.)*
+
 ## Method
 
 **Two channels, measured the same way.**
@@ -66,16 +92,29 @@ hypothesis-*generator*.
 
 ## Layout
 
+Active pattern-hunt path (start here):
+
 ```
-ontology/archetypes.yaml        archetype -> symbolic search terms (the arguable core)
-ontology/literal_controls.yaml  event category -> literal control terms
+symbols.yaml                    the tracked symbol clusters (edit the queries here)
+make_export_links.py            -> data/trends_export/EXPORT_LINKS.md click-ready links
+data/trends_export/             drop your Google Trends CSV exports here (<key>.csv)
 data/events.csv                 dated, categorized world events (2004+, Trends' floor)
+src/symbols.py                  cluster loader + explore-URL builder
+src/trends_import.py            reads Google Trends CSV exports into tidy frames
+src/visualize.py                small-multiple series + event overlays + sun/moon ratio
+analyze.py                      CLI: import exports -> results/*.png
+```
+
+Optional statistical follow-up (for when a pattern looks worth pressure-testing):
+
+```
+ontology/archetypes.yaml        archetype -> symbolic search terms
+ontology/literal_controls.yaml  event category -> literal control terms
 data/placebo_terms.txt          neutral control terms
-src/trends.py                   Trends providers: live (pytrends, cached) + synthetic (offline)
 src/analysis.py                 standardized pre-event lift
 src/nulls.py                    empirical null + Benjamini-Hochberg FDR
-src/scan.py                     the broad scan orchestration + plots
-run_scan.py                     CLI
+src/scan.py, run_scan.py        broad scan with null models (synthetic self-test)
+src/trends.py                   live (pytrends, cached) + synthetic providers
 ```
 
 ## Usage

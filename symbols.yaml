@@ -1,0 +1,38 @@
+# The symbol clusters to track, as chosen for the pattern hunt.
+#
+# Each cluster maps to ONE Google Trends query. Within a query, " + " means OR
+# (Trends syntax), so a cluster can pool several near-synonymous figures into a
+# single co-normalized series. `file` is the filename stem you save the Trends
+# CSV export as (see data/trends_export/EXPORT_LINKS.md).
+#
+# Query choices lean toward the archetypal/mythic sense and away from the most
+# brand/celebrity-polluted bare words (e.g. the Mother is tracked via
+# Kali/Gaia/Witch, not "Madonna" the singer). Everything here is a plain string
+# you can edit and re-export -- nothing downstream hard-codes these.
+
+version: 1
+
+clusters:
+  serpent_snake:   {label: "Serpent / Snake",              query: "snake + serpent"}
+  flood_deluge:    {label: "Flood / Deluge",               query: "flood + deluge"}
+  fire:            {label: "Fire / Conflagration",         query: "inferno + conflagration"}
+  blood:           {label: "Blood",                        query: "blood"}
+  mother_dark:     {label: "Mother (Kali/Gaia/Witch)",     query: "kali + gaia + the witch"}
+  father_king:     {label: "Father / King / Ruler",        query: "the king + tyrant + ruler"}
+  child_rebirth:   {label: "Child / Rebirth / Divine Child", query: "rebirth + divine child"}
+  wise_old_man:    {label: "Wise Old Man / Prophet / Oracle", query: "prophet + oracle + the sage"}
+  shadow_double:   {label: "Shadow / Enemy / Double",      query: "shadow + doppelganger"}
+  trickster:       {label: "Trickster",                    query: "trickster + loki + jester"}
+  hero_warrior:    {label: "Hero / Warrior / Savior",      query: "hero + warrior + savior"}
+  apocalypse:      {label: "Apocalypse / End / Last Judgment", query: "apocalypse + armageddon + end of the world"}
+  mandala_wheel:   {label: "Mandala / Circle / Wheel",     query: "mandala + the wheel"}
+  dragon:          {label: "Dragon",                       query: "dragon"}
+  tower_fortress:  {label: "Tower / Wall / Fortress",      query: "tower + fortress + the wall"}
+  wolf_beast:      {label: "Wolf / the Beast",             query: "wolf + the beast"}
+
+# Sun and Moon are exported TOGETHER in one query so they share a 0-100 scale,
+# which is what makes their ratio meaningful. Saved as sun_moon.csv.
+pairs:
+  sun_moon:
+    label: "Sun & Moon (ratio)"
+    query: ["sun", "moon"]
