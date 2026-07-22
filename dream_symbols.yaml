@@ -1,0 +1,35 @@
+# Dream-symbol queries, co-normalized against a generic baseline.
+#
+# Different reference frame from symbols.yaml: instead of a bare mythic word
+# (which drags in brand/media pollution -- "dragon" means Game of Thrones as
+# often as anything archetypal), each symbol here is queried as "<symbol> dream
+# meaning". Almost nobody searches that phrase for a non-dream reason, so this
+# channel is close to a direct read of "what are people dreaming about (and
+# looking up) lately" -- much less polluted than the top-down symbol clusters.
+#
+# `baseline` is the generic "dream meaning" query: the general appetite for
+# dream interpretation, whatever its own trend/seasonality. Every symbol is
+# fetched TOGETHER with the baseline in one Trends request (so they share a
+# 0-100 scale), and we then look at symbol/baseline -- the symbol's *share* of
+# dream-interpretation search -- which cancels out the baseline's own drift.
+#
+# Trends caps comparisons at 5 terms, so symbols are pulled in batches of 4 +
+# baseline (see src/dream_trends.py). Query phrasing normalized to "<symbol>
+# dream meaning" throughout for consistency (the task named one as "dream
+# meaning baby" -- using the same word order as the rest here).
+
+version: 1
+baseline: "dream meaning"
+
+symbols:
+  spider:        {label: "Spider",        query: "spider dream meaning"}
+  snake:         {label: "Snake",         query: "snake dream meaning"}
+  falling_teeth: {label: "Teeth falling", query: "falling teeth dream meaning"}
+  flood:         {label: "Flood",         query: "flood dream meaning"}
+  water:         {label: "Water",         query: "water dream meaning"}
+  baby:          {label: "Baby",          query: "baby dream meaning"}
+  money:         {label: "Money",         query: "money dream meaning"}
+  pregnant:      {label: "Pregnant",      query: "pregnant dream meaning"}
+  fish:          {label: "Fish",          query: "fish dream meaning"}
+  cat:           {label: "Cat",           query: "cat dream meaning"}
+  death:         {label: "Death",         query: "death dream meaning"}
