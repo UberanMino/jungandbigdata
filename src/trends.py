@@ -354,10 +354,14 @@ class FullHistoryFetcher:
             raws.append(raw)
         return _stitch(raws)
 
-    def run(self, only: list[str] | None = None) -> FetchReport:
+    def run(self, only: list[str] | None = None, clusters: list[Cluster] | None = None) -> FetchReport:
+        """`clusters` overrides the default symbols.yaml cluster list -- lets
+        other pipelines (e.g. src/dream_trends.py) reuse this fetcher's
+        windowing/stitching/backoff/caching for their own query sets."""
         report = FetchReport()
         self.export_dir.mkdir(parents=True, exist_ok=True)
-        clusters = [c for c in load_clusters() if only is None or c.key in only]
+        pool = clusters if clusters is not None else load_clusters()
+        clusters = [c for c in pool if only is None or c.key in only]
         for cluster in clusters:
             print(f"[{cluster.key}] {cluster.label} :: {cluster.queries}", flush=True)
             export_csv = self.export_dir / f"{cluster.key}.csv"

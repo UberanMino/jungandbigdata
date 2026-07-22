@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Fetch '<symbol> dream meaning' queries co-normalized against the generic
-'dream meaning' baseline, over 2004-present monthly. Symbol list lives in
-dream_symbols.yaml. Batches of 4 symbols + baseline are pulled per Trends
-request (5-term cap); each window is cached so the run is resumable, and
-pulls are politely rate-limited with backoff on 429s.
+"""Fetch '<symbol> dream meaning' queries and the generic 'dream meaning'
+baseline over 2004-present monthly. Symbol list lives in dream_symbols.yaml.
+
+Each query is pulled INDEPENDENTLY (one term per Trends request) so it gets its
+own full 0-100 resolution -- batching a rare symbol phrase together with the
+much higher-volume baseline was tried first and floors the symbol to near-zero
+(Trends normalizes the whole request to its loudest term). Each window is
+cached so the run is resumable, and pulls are politely rate-limited with
+backoff on 429s.
 
 Usage:
     python fetch_dream_trends.py
@@ -13,7 +17,7 @@ from __future__ import annotations
 
 import argparse
 
-from src.dream_trends import DreamBatchFetcher
+from src.dream_trends import fetch_all
 
 
 def main() -> None:
@@ -24,8 +28,7 @@ def main() -> None:
     ap.add_argument("--tries", type=int, default=8)
     args = ap.parse_args()
 
-    fetcher = DreamBatchFetcher(geo=args.geo, pause=args.pause, backoff=args.backoff, tries=args.tries)
-    report = fetcher.run()
+    report = fetch_all(geo=args.geo, pause=args.pause, backoff=args.backoff, tries=args.tries)
 
     print("\n" + "=" * 60)
     print("DREAM FETCH SUMMARY")
